@@ -1,0 +1,59 @@
+{
+  "name": "@leads/shared",
+  "version": "0.0.1",
+  "private": true,
+  "description": "The shared kernel, the deployments, and the naming contract.",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./src/*",
+      "./src/*.ts",
+      "./src/*.tsx",
+      "./src/*/index.ts"
+    ]
+  },
+  "exports": {
+    "./deployments": "./src/Infrastructure/Shared/deployments.ts",
+    "./domain/billing": "./src/Core/Shared/Domain/billing.ts",
+    "./domain/handlerSettings": "./src/Core/Shared/Domain/handlerSettings.ts",
+    "./domain/handlerTimeouts": "./src/Core/Shared/Domain/handlerTimeouts.ts",
+    "./domain/keys": "./src/Core/Shared/Domain/keys.ts",
+    "./domain/orderWrites": "./src/Core/Shared/Domain/orderWrites.ts",
+    "./domain/prices": "./src/Core/Shared/Domain/prices.ts",
+    "./domain/queueLimits": "./src/Core/Shared/Domain/queueLimits.ts",
+    "./domain/queueSettings": "./src/Core/Shared/Domain/queueSettings.ts",
+    "./domain/request": "./src/Core/Shared/Domain/request.ts",
+    "./domain/schemas": "./src/Core/Shared/Domain/schemas.ts",
+    "./domain/sources/BusinessClosure": "./src/Core/Shared/Domain/sources/BusinessClosure.ts",
+    "./domain/sources/Mutation": "./src/Core/Shared/Domain/sources/Mutation.ts",
+    "./domain/sources/NewAcquisition": "./src/Core/Shared/Domain/sources/NewAcquisition.ts",
+    "./domain/stages": "./src/Core/Shared/Domain/stages.ts",
+    "./domain/types": "./src/Core/Shared/Domain/types.ts",
+    "./infrastructure/awsErrors": "./src/Infrastructure/Shared/awsErrors.ts",
+    "./infrastructure/RequestLedger/live": "./src/Infrastructure/Shared/RequestLedger/live.ts",
+    "./infrastructure/RequestLedger/mock/variants": "./src/Infrastructure/Shared/RequestLedger/mock/variants.ts",
+    "./names": "./src/Infrastructure/Shared/names.ts",
+    "./ports/RequestLedger": "./src/Core/Shared/Ports/RequestLedger.ts",
+    "./testing/variants": "./src/Core/Shared/Ports/testing/variants.ts",
+    "./utils": "./src/Utils/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "catalog:",
+    "@aws-sdk/lib-dynamodb": "catalog:",
+    "date-fns": "^4.4.0",
+    "effect": "catalog:",
+    "voca": "^1.4.1"
+  },
+  "devDependencies": {
+    "@leads/typescript-config": "workspace:*",
+    "@leads/vitest-config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/voca": "^1.4.6",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

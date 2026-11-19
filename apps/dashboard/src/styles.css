@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+/* The theme that the dashboard shares with the lab. It also gives Tailwind the classes of the UI kit. */
+@import '@leads/ui/globals.css';

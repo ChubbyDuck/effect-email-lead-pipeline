@@ -1,0 +1,19 @@
+{
+  "name": "@leads/vitest-config",
+  "version": "0.0.1",
+  "private": true,
+  "description": "The common Vitest settings of the packages.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@leads/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

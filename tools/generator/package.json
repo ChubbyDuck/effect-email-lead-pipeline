@@ -1,0 +1,47 @@
+{
+  "name": "@leads/generator",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Makes test workbooks, emails, and the input catalog, and sends them.",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./src/*",
+      "./src/*.ts",
+      "./src/*.tsx",
+      "./src/*/index.ts"
+    ]
+  },
+  "scripts": {
+    "gen": "tsx src/gen.ts",
+    "send": "tsx src/send.ts",
+    "catalog": "tsx src/catalog/gen.ts",
+    "mail": "tsx src/mail.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "catalog:",
+    "@aws-sdk/lib-dynamodb": "catalog:",
+    "@faker-js/faker": "^10.6.0",
+    "@leads/pipeline": "workspace:*",
+    "@leads/shared": "workspace:*",
+    "date-fns": "^4.4.0",
+    "effect": "catalog:",
+    "mailparser": "^3.14.5",
+    "nodemailer": "^10.6.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz"
+  },
+  "devDependencies": {
+    "@leads/lambda": "workspace:*",
+    "@leads/typescript-config": "workspace:*",
+    "@leads/vitest-config": "workspace:*",
+    "@types/aws-lambda": "^8.10.163",
+    "@types/mailparser": "^3.9.0",
+    "@types/node": "catalog:",
+    "@types/nodemailer": "^8.0.2",
+    "tsx": "4.23.15",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,10 @@
+# The Floci of the plan test (`test:integration`), in a Compose project of its own. It runs the Floci image of Alchemy:
+# the image of the repo lacks `DescribeContributorInsights`, which `DynamoDB.Table` calls (spec 0005).
+name: leads-alchemy-integration
+services:
+  floci:
+    image: ghcr.io/alchemy-run/floci:2.4.0-alchemy.3@sha256:c9e87d338c8a7be6fa131451961a8baa1e0f9f6312b5aea44a00f12472d5bd85
+    ports:
+      - '127.0.0.1:4570:4566'
+    environment:
+      FLOCI_SERVICES_CLOUDFRONT_EDGE_PORTS_ENABLED: 'false'

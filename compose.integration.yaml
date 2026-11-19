@@ -1,0 +1,7 @@
+services:
+  floci:
+    image: floci/floci@sha256:f5aa8c18302cedb4f2385f5c4e455b3efc77fee6bf7b6e5d1712b2817ba102db
+    ports:
+      - '127.0.0.1:${FLOCI_PORT:-4566}:4566'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

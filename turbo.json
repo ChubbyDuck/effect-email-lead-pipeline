@@ -1,0 +1,106 @@
+{
+  "$schema": "https://v2-10-4.turborepo.dev/schema.json",
+  "ui": "stream",
+  "envMode": "strict",
+  "tasks": {
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
+    "typecheck": {
+      "dependsOn": ["transit"]
+    },
+    "test": {
+      "dependsOn": ["transit", "^build"],
+      "env": ["VITEST_INTEGRATION", "VITEST_E2E"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "dist-e2e/**", ".output/**"]
+    },
+    "build:e2e": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist-e2e/**"]
+    },
+    "test:integration": {
+      "dependsOn": ["transit"],
+      "cache": false,
+      "env": ["FLOCI_ENDPOINT", "VITEST_INTEGRATION"]
+    },
+    "test:e2e": {
+      "dependsOn": ["^build:e2e"],
+      "cache": false,
+      "env": ["FLOCI_ENDPOINT", "FLOCI_LAMBDA_ENDPOINT", "FLOCI_E2E_PORT", "LEADS_BUCKET_PREFIX", "VITEST_E2E"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_DEFAULT_REGION"]
+    },
+    "smoke:floci": {
+      "dependsOn": ["^build:e2e"],
+      "cache": false,
+      "env": ["FLOCI_ENDPOINT", "FLOCI_LAMBDA_ENDPOINT", "FLOCI_E2E_PORT", "LEADS_BUCKET_PREFIX", "VITEST_E2E"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_DEFAULT_REGION"]
+    },
+    "test:e2e:alchemy": {
+      "dependsOn": ["^build:e2e"],
+      "cache": false,
+      "env": ["FLOCI_ENDPOINT", "FLOCI_LAMBDA_ENDPOINT", "FLOCI_E2E_PORT", "LEADS_BUCKET_PREFIX", "VITEST_E2E"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_DEFAULT_REGION"]
+    },
+    "smoke:alchemy": {
+      "dependsOn": ["^build:e2e"],
+      "cache": false,
+      "env": ["FLOCI_ENDPOINT", "FLOCI_LAMBDA_ENDPOINT", "FLOCI_E2E_PORT", "LEADS_BUCKET_PREFIX", "VITEST_E2E"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_DEFAULT_REGION"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "env": ["DEPLOYMENT", "AWS_PROFILE", "FLOCI_ENDPOINT", "PORT"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+    },
+    "synth": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["DEPLOYMENT", "AWS_PROFILE"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+    },
+    "diff": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["DEPLOYMENT", "AWS_PROFILE", "FLOCI_ENDPOINT", "FLOCI_LAMBDA_ENDPOINT"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+    },
+    "deploy": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["DEPLOYMENT", "AWS_PROFILE", "FLOCI_ENDPOINT", "FLOCI_LAMBDA_ENDPOINT"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+    },
+    "destroy": {
+      "cache": false,
+      "env": ["DEPLOYMENT", "AWS_PROFILE", "FLOCI_ENDPOINT"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+    },
+    "mail:diff": { "cache": false, "env": ["AWS_PROFILE"] },
+    "mail:deploy": { "cache": false, "env": ["AWS_PROFILE"] },
+    "deploy:floci": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "env": ["DEPLOYMENT", "FLOCI_ENDPOINT", "FLOCI_LAMBDA_ENDPOINT", "LEADS_CDK_APP", "CDK_DEFAULT_REGION"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+    },
+    "gen": { "cache": false },
+    "catalog": { "cache": false, "env": ["DEPLOYMENT"] },
+    "mail": { "cache": false, "env": ["DEPLOYMENT"], "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"] },
+    "send": {
+      "cache": false,
+      "env": ["DEPLOYMENT", "AWS_PROFILE", "FLOCI_ENDPOINT"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+    },
+    "bench:lead-sources-memory": {
+      "cache": false,
+      "env": ["FLOCI_ENDPOINT"],
+      "passThroughEnv": ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+    },
+    "//#lint": {},
+    "//#format:changed": { "cache": false }
+  }
+}

@@ -1,0 +1,66 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+/* The burst simulator: scoped classes on the same theme. */
+@import './UI/Simulator/simulator.css' layer(components);
+/*
+ * The theme that the lab shares with the dashboard. It comes after the simulator, so that the compiled CSS keeps
+ * the order that it had before the theme moved out. It also gives Tailwind the classes of the UI kit.
+ */
+@import '@leads/ui/globals.css';
+
+:root {
+  /* One categorical color per AWS service, as on the burst simulator. */
+  --service-lambda: #2a78d6;
+  --service-s3: #eb6834;
+  --service-sqs: #1baf7a;
+  --service-ses: #eda100;
+  --service-dynamodb: #e87ba4;
+  --service-cloudwatch-logs: #8b6fd6;
+}
+
+/* Two equal animations: a row that changes again gets the other name, and a new name starts the animation again. */
+@keyframes flash-0 {
+  from {
+    background: var(--live-soft);
+  }
+  to {
+    background: transparent;
+  }
+}
+@keyframes flash-1 {
+  from {
+    background: var(--live-soft);
+  }
+  to {
+    background: transparent;
+  }
+}
+tr.flash-0 td {
+  animation: flash-0 2s ease-out;
+}
+tr.flash-1 td {
+  animation: flash-1 2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  tr.flash-0 td,
+  tr.flash-1 td {
+    animation: none;
+  }
+}
+
+/* A number that changed flashes once. A new key on the element starts the animation again. */
+@keyframes tick {
+  from {
+    color: var(--live);
+  }
+}
+.tick {
+  animation: tick 1s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tick {
+    animation: none;
+  }
+}

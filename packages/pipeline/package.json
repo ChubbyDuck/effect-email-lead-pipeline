@@ -1,0 +1,69 @@
+{
+  "name": "@leads/pipeline",
+  "version": "0.0.1",
+  "private": true,
+  "description": "The Pipeline hexagon: the inbox, source, and lead handlers.",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./src/*",
+      "./src/*.ts",
+      "./src/*.tsx",
+      "./src/*/index.ts"
+    ]
+  },
+  "exports": {
+    "./application/HandleInbox/command": "./src/Core/Pipeline/Application/UseCases/HandleInbox/command.ts",
+    "./application/HandleInbox/handler": "./src/Core/Pipeline/Application/UseCases/HandleInbox/handler.ts",
+    "./application/HandleLead/command": "./src/Core/Pipeline/Application/UseCases/HandleLead/command.ts",
+    "./application/HandleLead/handler": "./src/Core/Pipeline/Application/UseCases/HandleLead/handler.ts",
+    "./application/HandleLeadSources/command": "./src/Core/Pipeline/Application/UseCases/HandleLeadSources/command.ts",
+    "./application/HandleLeadSources/handler": "./src/Core/Pipeline/Application/UseCases/HandleLeadSources/handler.ts",
+    "./domain/Transformations/file": "./src/Core/Pipeline/Domain/Transformations/file.ts",
+    "./domain/Transformations/leads": "./src/Core/Pipeline/Domain/Transformations/leads.ts",
+    "./domain/Transformations/leadSources": "./src/Core/Pipeline/Domain/Transformations/leadSources.ts",
+    "./infrastructure/EmailParser/live": "./src/Infrastructure/Pipeline/EmailParser/live.ts",
+    "./infrastructure/ExcelSheetParser/live": "./src/Infrastructure/Pipeline/ExcelSheetParser/live.ts",
+    "./infrastructure/Guard/live": "./src/Infrastructure/Pipeline/Guard/live.ts",
+    "./infrastructure/OrderRepository/limited": "./src/Infrastructure/Pipeline/OrderRepository/limited.ts",
+    "./infrastructure/OrderRepository/live": "./src/Infrastructure/Pipeline/OrderRepository/live.ts",
+    "./infrastructure/Queue/live": "./src/Infrastructure/Pipeline/Queue/live.ts",
+    "./infrastructure/RuntimeSettings/live": "./src/Infrastructure/Pipeline/RuntimeSettings/live.ts",
+    "./infrastructure/Storage/live": "./src/Infrastructure/Pipeline/Storage/live.ts",
+    "./ports/EmailParser": "./src/Core/Pipeline/Ports/EmailParser.ts",
+    "./ports/ExcelSheetParser": "./src/Core/Pipeline/Ports/ExcelSheetParser.ts",
+    "./ports/Guard": "./src/Core/Pipeline/Ports/Guard.ts",
+    "./ports/OrderRepository": "./src/Core/Pipeline/Ports/OrderRepository.ts",
+    "./ports/Queue": "./src/Core/Pipeline/Ports/Queue.ts",
+    "./ports/Storage": "./src/Core/Pipeline/Ports/Storage.ts",
+    "./settings": "./src/Core/Pipeline/Application/config.ts",
+    "./testing/email": "./src/Core/Pipeline/Application/UseCases/testing/email.ts",
+    "./testing/workbooks": "./src/Core/Pipeline/Application/UseCases/testing/workbooks.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "VITEST_INTEGRATION=1 vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-appconfigdata": "catalog:",
+    "@aws-sdk/client-dynamodb": "catalog:",
+    "@aws-sdk/client-s3": "catalog:",
+    "@aws-sdk/client-sqs": "catalog:",
+    "@aws-sdk/lib-dynamodb": "catalog:",
+    "@leads/shared": "workspace:*",
+    "effect": "catalog:",
+    "file-type": "22.3.0",
+    "mailparser": "^3.14.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-appconfig": "catalog:",
+    "@leads/typescript-config": "workspace:*",
+    "@leads/vitest-config": "workspace:*",
+    "@types/mailparser": "^3.9.0",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

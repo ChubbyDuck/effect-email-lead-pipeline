@@ -1,0 +1,39 @@
+{
+  "name": "@leads/alchemy",
+  "version": "0.0.1",
+  "private": true,
+  "description": "The Alchemy stack of the pipeline.",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./src/*",
+      "./src/*.ts"
+    ]
+  },
+  "scripts": {
+    "deploy": "alchemy deploy",
+    "diff": "alchemy deploy --dry-run",
+    "destroy": "alchemy destroy",
+    "mail:diff": "alchemy deploy src/mail/alchemy.run.ts --stage mail --profile ${AWS_PROFILE:?Set AWS_PROFILE to the profile of the AWS project} --dry-run",
+    "mail:deploy": "alchemy deploy src/mail/alchemy.run.ts --stage mail --profile ${AWS_PROFILE:?Set AWS_PROFILE to the profile of the AWS project} --yes",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "sh test-integration.sh"
+  },
+  "dependencies": {
+    "@alchemy.run/aws": "2.0.0-beta.87",
+    "@effect/platform-node": "4.1.4",
+    "@leads/lambda": "workspace:*",
+    "@leads/pipeline": "workspace:*",
+    "@leads/shared": "workspace:*",
+    "alchemy": "2.0.0-beta.87",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@leads/typescript-config": "workspace:*",
+    "@leads/vitest-config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,866 @@
+{
+  "$schema": "./node_modules/@effect/tsgo/oxlint-schema.json",
+  "jsPlugins": ["@shadcn/lint"],
+  "options": {
+    "typeAware": true
+  },
+  "plugins": ["typescript", "import", "react", "jsx-a11y", "vitest", "effecttsgo"],
+  "settings": {
+    "shadcn": {
+      "ui": "@leads/ui/components"
+    }
+  },
+  "categories": {
+    "correctness": "warn"
+  },
+  "rules": {
+    "typescript/consistent-type-imports": [
+      "warn",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports",
+        "disallowTypeAnnotations": false
+      }
+    ],
+    "eslint/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "args": "none",
+        "caughtErrors": "none",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "react/rules-of-hooks": "warn",
+    "react/exhaustive-deps": "warn",
+    "react/react-in-jsx-scope": "off",
+    "eslint/no-debugger": "warn",
+    "typescript/triple-slash-reference": "off",
+    "typescript/unbound-method": "off",
+    "typescript/require-array-sort-compare": "off",
+    "typescript/no-base-to-string": "error",
+    "typescript/no-misused-spread": "error",
+
+    "effecttsgo/catch-unfailable-effect": "error",
+    "effecttsgo/class-self-mismatch": "error",
+    "effecttsgo/duplicate-package": "error",
+    "effecttsgo/effect-fn-iife": "error",
+    "effecttsgo/effect-fn-implicit-any": "error",
+    "effecttsgo/effect-gen-uses-adapter": "error",
+    "effecttsgo/effect-in-failure": "error",
+    "effecttsgo/effect-in-void-success": "error",
+    "effecttsgo/floating-effect": "error",
+    "effecttsgo/floating-effect-in-vitest": "error",
+    "effecttsgo/generic-effect-services": "error",
+    "effecttsgo/layer-merge-all-with-dependencies": "error",
+    "effecttsgo/lazy-promise-in-effect-sync": "error",
+    "effecttsgo/leaking-requirements": "error",
+    "effecttsgo/missing-effect-context": "error",
+    "effecttsgo/missing-effect-error": "error",
+    "effecttsgo/missing-layer-context": "error",
+    "effecttsgo/missing-star-in-yield-effect-gen": "error",
+    "effecttsgo/multiple-effect-provide": "error",
+    "effecttsgo/non-object-effect-service-type": "error",
+    "effecttsgo/outdated-api": "error",
+    "effecttsgo/overridden-schema-constructor": "error",
+    "effecttsgo/promise-in-effect-success": "error",
+    "effecttsgo/return-effect-in-gen": "error",
+    "effecttsgo/run-effect-inside-effect": "error",
+    "effecttsgo/schema-literal-non-finite": "error",
+    "effecttsgo/schema-opaque-instance-member": "error",
+    "effecttsgo/scope-in-layer-effect": "error",
+    "effecttsgo/try-catch-in-effect-gen": "error",
+
+    "effecttsgo/any-unknown-in-error-context": "error",
+    "effecttsgo/lazy-effect": "error",
+    "effecttsgo/missing-return-yield-star": "error",
+    "effecttsgo/schema-number": "error",
+    "effecttsgo/unknown-in-effect-catch": "error",
+
+    "effecttsgo/deterministic-keys": "error",
+    "effecttsgo/effect-succeed-with-void": "error",
+    "effecttsgo/missed-pipeable-opportunity": "error",
+    "effecttsgo/new-schema-class": "error",
+    "effecttsgo/prefer-typed-schema-decoder": "error",
+    "effecttsgo/unnecessary-effect-gen": "error",
+    "effecttsgo/unnecessary-fail-yieldable-error": "error",
+    "effecttsgo/extends-native-error": "error",
+    "effecttsgo/global-error-in-effect-catch": "error",
+    "effecttsgo/global-error-in-effect-failure": "error",
+
+    "effecttsgo/global-console": "off",
+    "effecttsgo/global-date": "off",
+    "effecttsgo/process-env": "off",
+
+    "effecttsgo/async-function": "off",
+    "effecttsgo/global-random": "off",
+    "effecttsgo/global-timers": "off",
+    "effecttsgo/missing-pipeable-signature": "off",
+    "effecttsgo/new-promise": "off",
+    "effecttsgo/node-builtin-import": "off",
+    "effecttsgo/strict-boolean-expressions": "off",
+    "effecttsgo/strict-effect-provide": "off"
+  },
+  "overrides": [
+    {
+      "files": ["apps/lambda/src/Entrypoints/**"],
+      "rules": {
+        "effecttsgo/process-env": "error"
+      }
+    },
+    {
+      "files": ["apps/lab/src/Core/Observation/**", "apps/lab/src/Infrastructure/Observation/**"],
+      "rules": {
+        "effecttsgo/extends-native-error": "off"
+      }
+    },
+    {
+      "files": ["**/*.stories.tsx", "**/*.stories.ts", "**/*.spec.*", "**/*.test.*"],
+      "rules": {
+        "typescript/no-non-null-assertion": "off",
+        "react/rules-of-hooks": "off",
+        "vitest/require-mock-type-parameters": "off"
+      }
+    },
+    {
+      "files": ["**/testing/**/*.ts", "**/*test*.ts", "**/*test*.tsx"],
+      "rules": {
+        "vitest/require-mock-type-parameters": "off"
+      }
+    },
+    {
+      "files": ["packages/shared/src/Core/Shared/Domain/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Shared/Domain/**"],
+                "message": "The Domain of the shared kernel imports only itself."
+              },
+              {
+                "group": ["@leads/**"],
+                "message": "The Domain of the shared kernel imports only itself. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/shared/src/Core/Shared/Ports/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Shared/**"],
+                "message": "The Ports of the shared kernel import only the shared kernel."
+              },
+              {
+                "group": ["@leads/**"],
+                "message": "The Ports of the shared kernel import only the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/pipeline/src/Core/Pipeline/Domain/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Pipeline/Domain/**"],
+                "message": "Domain imports only its own Domain and the Domain of the shared kernel."
+              },
+              {
+                "group": ["@leads/**", "!@leads/shared/domain/**", "!@leads/shared/utils"],
+                "message": "Domain imports only its own Domain and the Domain of the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/dashboard/src/Core/Orders/Domain/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Orders/Domain/**"],
+                "message": "Domain imports only its own Domain and the Domain of the shared kernel."
+              },
+              {
+                "group": ["@leads/**", "!@leads/shared/domain/**", "!@leads/shared/utils"],
+                "message": "Domain imports only its own Domain and the Domain of the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/Core/Simulation/Domain/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Simulation/Domain/**"],
+                "message": "Domain imports only its own Domain and the Domain of the shared kernel. Simulation never imports Observation."
+              },
+              {
+                "group": ["@leads/**", "!@leads/shared/domain/**", "!@leads/shared/utils"],
+                "message": "Domain imports only its own Domain and the Domain of the shared kernel. Simulation never imports Observation. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/Core/Observation/Domain/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Observation/Domain/**"],
+                "message": "Domain imports only its own Domain and the Domain of the shared kernel. Only the comparison imports the Simulation domain."
+              },
+              {
+                "group": ["@leads/**", "!@leads/shared/domain/**", "!@leads/shared/utils"],
+                "message": "Domain imports only its own Domain and the Domain of the shared kernel. Only the comparison imports the Simulation domain. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "apps/lab/src/Core/Observation/Domain/comparison.ts",
+        "apps/lab/src/Core/Observation/Domain/comparisonSummary.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Observation/Domain/**", "!\\#Core/Simulation/Domain/**"],
+                "message": "The comparison imports its own Domain, the Domain of the shared kernel, and the declared edge: the Domain of Simulation."
+              },
+              {
+                "group": ["@leads/**", "!@leads/shared/domain/**", "!@leads/shared/utils"],
+                "message": "The comparison imports its own Domain, the Domain of the shared kernel, and the declared edge: the Domain of Simulation. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/pipeline/src/Core/Pipeline/Ports/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Pipeline/Domain/**", "!\\#Core/Pipeline/Ports/**"],
+                "message": "Ports import the Domain of their subdomain and the shared kernel."
+              },
+              {
+                "group": [
+                  "@leads/**",
+                  "!@leads/shared/domain/**",
+                  "!@leads/shared/utils",
+                  "!@leads/shared/ports/**",
+                  "!@leads/shared/testing/**"
+                ],
+                "message": "Ports import the Domain of their subdomain and the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/dashboard/src/Core/Orders/Ports/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Orders/Domain/**", "!\\#Core/Orders/Ports/**"],
+                "message": "Ports import the Domain of their subdomain and the shared kernel."
+              },
+              {
+                "group": [
+                  "@leads/**",
+                  "!@leads/shared/domain/**",
+                  "!@leads/shared/utils",
+                  "!@leads/shared/ports/**",
+                  "!@leads/shared/testing/**"
+                ],
+                "message": "Ports import the Domain of their subdomain and the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/Core/Observation/Ports/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Observation/Domain/**", "!\\#Core/Observation/Ports/**"],
+                "message": "Ports import the Domain of their subdomain and the shared kernel."
+              },
+              {
+                "group": [
+                  "@leads/**",
+                  "!@leads/shared/domain/**",
+                  "!@leads/shared/utils",
+                  "!@leads/shared/ports/**",
+                  "!@leads/shared/testing/**"
+                ],
+                "message": "Ports import the Domain of their subdomain and the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/pipeline/src/Core/Pipeline/Application/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^#Core/[^/]+/Application/UseCases/",
+                "message": "A use case never calls a different use case. The driving adapter sets the sequence."
+              },
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Pipeline/**"],
+                "message": "Application imports its own subdomain and the shared kernel."
+              },
+              {
+                "group": [
+                  "@leads/**",
+                  "!@leads/shared/domain/**",
+                  "!@leads/shared/utils",
+                  "!@leads/shared/ports/**",
+                  "!@leads/shared/testing/**"
+                ],
+                "message": "Application imports its own subdomain and the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/dashboard/src/Core/Orders/Application/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^#Core/[^/]+/Application/UseCases/",
+                "message": "A use case never calls a different use case. The driving adapter sets the sequence."
+              },
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Orders/**"],
+                "message": "Application imports its own subdomain and the shared kernel."
+              },
+              {
+                "group": [
+                  "@leads/**",
+                  "!@leads/shared/domain/**",
+                  "!@leads/shared/utils",
+                  "!@leads/shared/ports/**",
+                  "!@leads/shared/testing/**"
+                ],
+                "message": "Application imports its own subdomain and the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/Core/Simulation/Application/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^#Core/[^/]+/Application/UseCases/",
+                "message": "A use case never calls a different use case. The driving adapter sets the sequence."
+              },
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Simulation/**"],
+                "message": "Simulation has no ports. Its Application imports its own subdomain and the Domain of the shared kernel. Simulation never imports Observation."
+              },
+              {
+                "group": ["@leads/**", "!@leads/shared/domain/**", "!@leads/shared/utils"],
+                "message": "Simulation has no ports. Its Application imports its own subdomain and the Domain of the shared kernel. Simulation never imports Observation. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/Core/Observation/Application/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^#Core/[^/]+/Application/UseCases/",
+                "message": "A use case never calls a different use case. The driving adapter sets the sequence."
+              },
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Observation/**"],
+                "message": "Application imports its own subdomain and the shared kernel."
+              },
+              {
+                "group": [
+                  "@leads/**",
+                  "!@leads/shared/domain/**",
+                  "!@leads/shared/utils",
+                  "!@leads/shared/ports/**",
+                  "!@leads/shared/testing/**"
+                ],
+                "message": "Application imports its own subdomain and the shared kernel. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/Core/Observation/Application/UseCases/CompareRequest/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^#Core/[^/]+/Application/UseCases/",
+                "message": "A use case never calls a different use case. The driving adapter sets the sequence."
+              },
+              {
+                "group": ["\\#Infrastructure/**", "\\#Entrypoints/**"],
+                "message": "The core never imports Infrastructure or Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^\\.\\./\\.\\./",
+                "message": "Import a different folder of the package with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Core/**", "!\\#Core/Observation/**", "!\\#Core/Simulation/Domain/**"],
+                "message": "CompareRequest imports its own subdomain, the shared kernel, and the declared edge: the Domain of Simulation."
+              },
+              {
+                "group": [
+                  "@leads/**",
+                  "!@leads/shared/domain/**",
+                  "!@leads/shared/utils",
+                  "!@leads/shared/ports/**",
+                  "!@leads/shared/testing/**"
+                ],
+                "message": "CompareRequest imports its own subdomain, the shared kernel, and the declared edge: the Domain of Simulation. Another package comes in only through the shared kernel."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/*/src/Infrastructure/**", "apps/*/src/Infrastructure/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Core/*/Application/**", "@leads/*/application/**", "@leads/pipeline/settings"],
+                "message": "Infrastructure implements Ports. It never imports Application."
+              },
+              {
+                "group": ["\\#Entrypoints/**", "@leads/lambda/**"],
+                "message": "Infrastructure never imports Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/Infrastructure/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["\\#Core/*/Application/**", "@leads/*/application/**", "@leads/pipeline/settings"],
+                "message": "Infrastructure implements Ports. It never imports Application."
+              },
+              {
+                "group": ["\\#Entrypoints/**", "@leads/lambda/**"],
+                "message": "Infrastructure never imports Entrypoints."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "group": ["@leads/pipeline", "@leads/pipeline/**"],
+                "message": "The lab installs @leads/pipeline only for one contract test. Code of the lab outside tests never imports it."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/Entrypoints/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@leads/pipeline", "@leads/pipeline/**"],
+                "message": "The lab installs @leads/pipeline only for one contract test. Code of the lab outside tests never imports it."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/lab/src/UI/**", "apps/lab/src/routes/**", "apps/lab/src/router.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "\\#Core/*/Ports/**",
+                  "\\#Infrastructure/**",
+                  "@leads/*/ports/**",
+                  "@leads/*/infrastructure/**",
+                  "@leads/shared/deployments",
+                  "@leads/shared/names"
+                ],
+                "message": "The UI never imports Ports or Infrastructure. Call an entry point of the Lab."
+              },
+              {
+                "group": [
+                  "\\#Core/*/Application/**",
+                  "!\\#Core/Simulation/Application/UseCases/SimulateBurst/**",
+                  "!\\#Core/Observation/Application/UseCases/CompareRequest/**"
+                ],
+                "message": "The UI calls only the use cases without ports (SimulateBurst, CompareRequest). A use case with ports goes through an entry point of the Lab."
+              },
+              {
+                "group": ["@leads/pipeline", "@leads/pipeline/**"],
+                "message": "The lab installs @leads/pipeline only for one contract test. Code of the lab outside tests never imports it."
+              },
+              {
+                "regex": "services\\.server$",
+                "message": "The UI never imports a composition root."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^(\\.\\./)+(Core|Infrastructure|Entrypoints)/",
+                "message": "Import the hexagon of the app with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Entrypoints/**", "!\\#Entrypoints/Lab/**", "@leads/lambda/**"],
+                "message": "The UI imports only the entry points of its own runtime."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/dashboard/src/UI/**", "apps/dashboard/src/routes/**", "apps/dashboard/src/router.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "\\#Core/*/Ports/**",
+                  "\\#Infrastructure/**",
+                  "@leads/*/ports/**",
+                  "@leads/*/infrastructure/**",
+                  "@leads/shared/deployments",
+                  "@leads/shared/names"
+                ],
+                "message": "The UI never imports Ports or Infrastructure. Call an entry point of the Dashboard."
+              },
+              {
+                "group": ["\\#Core/*/Application/**", "@leads/*/application/**"],
+                "message": "The dashboard has no use case without ports. A use case with ports goes through an entry point of the Dashboard."
+              },
+              {
+                "regex": "services\\.server$",
+                "message": "The UI never imports a composition root."
+              },
+              {
+                "group": ["@tanstack/react-start", "@tanstack/react-start/**", "aws-lambda"],
+                "message": "Only Entrypoints import a protocol library."
+              },
+              {
+                "regex": "^(\\.\\./)+(Core|Infrastructure|Entrypoints)/",
+                "message": "Import the hexagon of the app with a # path, so that the layer rules can check it."
+              },
+              {
+                "group": ["\\#Entrypoints/**", "!\\#Entrypoints/Dashboard/**", "@leads/lambda/**"],
+                "message": "The UI imports only the entry points of its own runtime."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "**/*.test.*",
+        "**/testing/**",
+        "**/*.typecheck.ts",
+        "apps/lab/src/routeTree.gen.ts",
+        "apps/dashboard/src/routeTree.gen.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "**/node_modules",
+    "**/dist",
+    "**/dist-e2e",
+    "**/build",
+    "**/coverage",
+    "**/.idea",
+    "**/cdk.out",
+    "**/.turbo",
+    "**/vite.config.ts.timestamp-*",
+    "tools/generator/output/**",
+    "tools/bench/results/**",
+    "docs/pipeline-video/target/**"
+  ]
+}

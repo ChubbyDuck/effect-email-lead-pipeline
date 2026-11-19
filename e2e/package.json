@@ -1,0 +1,32 @@
+{
+  "name": "@leads/e2e",
+  "version": "0.0.1",
+  "private": true,
+  "description": "The e2e suite of the deployed pipeline.",
+  "type": "module",
+  "scripts": {
+    "test:e2e": "sh test-e2e-floci.sh cdk",
+    "smoke:floci": "sh test-e2e-floci.sh cdk --testNamePattern E2E-OK",
+    "test:e2e:alchemy": "sh test-e2e-floci.sh alchemy",
+    "smoke:alchemy": "sh test-e2e-floci.sh alchemy --testNamePattern E2E-OK",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-lambda": "catalog:",
+    "@aws-sdk/client-s3": "catalog:",
+    "@aws-sdk/client-sqs": "catalog:",
+    "@leads/alchemy": "workspace:*",
+    "@leads/cdk": "workspace:*",
+    "@leads/lambda": "workspace:*",
+    "@leads/pipeline": "workspace:*",
+    "@leads/shared": "workspace:*",
+    "@leads/typescript-config": "workspace:*",
+    "@leads/vitest-config": "workspace:*",
+    "@types/aws-lambda": "^8.10.163",
+    "@types/node": "catalog:",
+    "@types/voca": "^1.4.6",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "voca": "^1.4.1"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "trailingComma": "es5",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "quoteProps": "as-needed",
+  "endOfLine": "lf",
+  "sortImports": {
+    "groups": ["builtin", "external", ["internal", "subpath"], ["parent", "sibling", "index"], "style", "unknown"]
+  },
+  "sortTailwindcss": {
+    "stylesheet": "apps/lab/src/styles.css",
+    "functions": ["clsx", "cn", "cva", "tw"]
+  },
+  "sortPackageJson": {
+    "sortScripts": false
+  },
+  "ignorePatterns": [
+    "**/node_modules",
+    "**/dist",
+    "**/dist-e2e",
+    "**/build",
+    "**/coverage",
+    "**/.idea",
+    "**/cdk.out",
+    "**/.turbo",
+    "**/vite.config.ts.timestamp-*",
+    "**/*.md",
+    "pnpm-lock.yaml",
+    "tools/generator/output",
+    "tools/bench/results",
+    "docs/pipeline-video/target"
+  ]
+}
