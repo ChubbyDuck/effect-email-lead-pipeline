@@ -1,0 +1,2158 @@
+/*
+ * The burst simulator on the theme of the lab. Every rule is scoped under `.simulator`, so that the page can share
+ * one stylesheet with the lab. The colors are the tokens of the theme, or mixes of them, so the page also follows
+ * the dark scheme.
+ */
+.simulator {
+  /* Steps between the foreground and the muted foreground of the theme, for the denser text of the simulator. */
+  --sim-ink-2: color-mix(in oklab, var(--foreground) 72%, var(--muted-foreground));
+  --sim-ink-4: color-mix(in oklab, var(--muted-foreground) 72%, var(--card));
+  --sim-ink-5: color-mix(in oklab, var(--muted-foreground) 50%, var(--card));
+  --sim-line: color-mix(in oklab, var(--border) 70%, var(--card));
+  --sim-line-soft: color-mix(in oklab, var(--border) 40%, var(--card));
+  --sim-sunken: color-mix(in oklab, var(--muted) 45%, var(--card));
+  --sim-accent-line: color-mix(in oklab, var(--primary) 35%, var(--card));
+  --sim-mono: --theme(--font-mono);
+  /* The selected range on the clock. The mix with the foreground darkens it on light and lightens it on dark. */
+  --sim-range: color-mix(in oklab, #6d5efc 82%, var(--foreground));
+  --sim-range-soft: color-mix(in oklab, color-mix(in oklab, #6d5efc 14%, var(--card)) 85%, transparent);
+  /* The tanks and the spans of the lanes. Each fill has an ink that stays readable on it in both schemes. */
+  --sim-tone-email: #5b6f8f;
+  --sim-tone-source: #b38140;
+  --span-init: #c9b8e8;
+  --span-get: #b7c3d4;
+  --span-ledger: #3e8f84;
+  --span-parse: #7d92b8;
+  --span-put: var(--primary);
+  --span-wait: #dde3ec;
+  --span-delete: var(--sim-tone-source);
+  --span-ink-on-light: #18212c;
+  --span-ink-on-dark: #ffffff;
+  --span-ink-on-put: var(--primary-foreground);
+  /* The real runs of a compared request, where they share a chart with the model. */
+  --sim-real: #e4572e;
+  /* The height above the sticky parts of the timeline, under the app header. The floating bar sets it. */
+  --sim-float: 52px;
+
+  /* The app header is above the page, and it is 68 px high. */
+  min-height: calc(100dvh - 68px);
+  background: var(--background);
+  color: var(--foreground);
+  font-synthesis: none;
+  /* The layout of the simulator is in pixels, made for the line height of the browser. */
+  line-height: normal;
+}
+/* Preflight removes the markers of a list. The limits are a list that keeps them. */
+.simulator .limit-alerts ul {
+  list-style: disc;
+}
+/* The ink of the SVG charts. */
+.simulator .svg-ink {
+  fill: var(--foreground);
+}
+.simulator .svg-ink-muted {
+  fill: var(--muted-foreground);
+}
+.simulator .svg-ink-2 {
+  fill: var(--sim-ink-2);
+}
+.simulator .svg-backdrop {
+  fill: var(--card);
+}
+.simulator .svg-stroke {
+  stroke: var(--foreground);
+}
+.simulator .svg-stroke-2 {
+  stroke: var(--sim-ink-2);
+}
+.simulator .svg-baseline {
+  stroke: var(--sim-line);
+}
+.simulator button,
+.simulator input,
+.simulator select {
+  font: inherit;
+}
+.simulator button,
+.simulator select {
+  cursor: pointer;
+}
+.simulator button {
+  color: inherit;
+  border: 1px solid var(--sim-line);
+  background: var(--card);
+  border-radius: 6px;
+  padding: 7px 11px;
+}
+.simulator button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+.simulator button,
+.simulator select,
+.simulator input {
+  outline-offset: 3px;
+}
+.simulator :focus-visible {
+  outline: 2px solid var(--primary);
+}
+.simulator code,
+.simulator .numeric,
+.simulator .metric-value {
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+}
+.simulator button:hover:not(:disabled) {
+  background: var(--accent);
+}
+.simulator a {
+  color: inherit;
+  text-decoration: none;
+}
+.simulator .workspace {
+  display: grid;
+  grid-template-columns: 282px minmax(0, 1fr);
+  align-items: start;
+}
+.simulator .controls {
+  background: var(--card);
+  border-right: 1px solid var(--sim-line);
+  padding: 28px 21px;
+  height: calc(100dvh - 68px);
+  position: sticky;
+  top: 68px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.simulator .eyebrow {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.simulator .sidebar-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.simulator .live-dot {
+  font-size: 11px;
+  color: var(--ok);
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.simulator .live-dot::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ok);
+}
+.simulator .sidebar-description {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  margin: 10px 0 25px;
+}
+.simulator .control-group h3 {
+  font-size: 12px;
+  font-weight: 650;
+  margin: 0 0 10px;
+}
+.simulator .control-group + .control-group {
+  margin-top: 23px;
+}
+.simulator .knob {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 43px;
+}
+.simulator .knob-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.simulator .knob-label code {
+  font-size: 10px;
+  color: var(--sim-ink-2);
+  min-width: 30px;
+  font-weight: 500;
+}
+.simulator .knob-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--input);
+  background: var(--card);
+  border-radius: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.simulator .knob-input input {
+  width: 67px;
+  height: 31px;
+  padding: 5px 6px;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  text-align: right;
+  font-family: var(--sim-mono);
+  font-size: 12px;
+}
+.simulator .knob-input:focus-within {
+  outline: 2px solid color-mix(in oklab, var(--ring) 50%, transparent);
+}
+.simulator .knob-input input:focus {
+  outline: none;
+}
+.simulator .knob-fixed .knob-input {
+  border-style: dashed;
+  background: transparent;
+}
+.simulator .knob-fixed .knob-input input {
+  color: var(--sim-ink-4);
+  cursor: default;
+}
+.simulator .knob-input > span {
+  font-size: 10px;
+  color: var(--sim-ink-4);
+  padding-right: 7px;
+}
+.simulator .timing-groups {
+  margin-top: 24px;
+  border-top: 1px solid var(--sim-line);
+}
+.simulator .timing-groups details {
+  border-bottom: 1px solid var(--sim-line);
+  padding: 13px 0;
+}
+.simulator .timing-groups summary {
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+}
+.simulator .timing-groups summary > span {
+  float: right;
+  color: var(--muted-foreground);
+  font-weight: 400;
+  font-size: 10px;
+}
+.simulator .timing-groups details[open] summary {
+  margin-bottom: 9px;
+}
+.simulator .timing-knob {
+  flex-direction: column;
+  align-items: stretch;
+  margin: 10px 0;
+}
+.simulator .timing-knob .knob-label {
+  justify-content: space-between;
+}
+.simulator .timing-knob .knob-input input {
+  width: 100%;
+}
+.simulator .sidebar-note {
+  margin-top: 22px;
+  padding: 14px;
+  background: var(--sim-sunken);
+  border: 1px solid var(--sim-line);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+}
+.simulator .sidebar-note strong {
+  color: var(--sim-ink-2);
+  font-weight: 600;
+}
+.simulator .sidebar-note p {
+  margin: 5px 0 0;
+}
+.simulator main {
+  padding: 33px 32px 0;
+  max-width: 1800px;
+  width: 100%;
+}
+.simulator .page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 27px;
+}
+.simulator h1 {
+  font-size: clamp(27px, 2.8vw, 38px);
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+  font-weight: 650;
+  margin: 9px 0 10px;
+}
+.simulator .title-period {
+  color: var(--primary);
+}
+.simulator .page-heading p {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.6;
+}
+.simulator .stage {
+  display: flex;
+  gap: 12px;
+  padding: 17px 19px;
+}
+.simulator .stage:not(:last-child) {
+  border-right: 1px solid var(--sim-line);
+}
+.simulator .stage h2 {
+  font-size: 12px;
+  font-weight: 650;
+  margin: 0 0 6px;
+}
+.simulator .stage p {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  margin: 0 0 8px;
+}
+.simulator .stage div > span {
+  display: block;
+  font-size: 9px;
+  color: var(--sim-ink-4);
+  line-height: 1.7;
+}
+.simulator .stage i {
+  font-style: normal;
+  margin: 0 3px;
+}
+.simulator .stage code {
+  color: var(--muted-foreground);
+}
+.simulator .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 23px;
+}
+.simulator .metric {
+  min-width: 0;
+  padding: 17px;
+}
+.simulator .summary-grid .metric {
+  background: var(--card);
+  border: 1px solid var(--sim-line);
+  border-radius: 8px;
+}
+.simulator .summary-grid .metric:first-child {
+  border-top: 2px solid var(--primary);
+  padding-top: 16px;
+}
+.simulator .metric-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.simulator .metric-label code {
+  color: var(--sim-ink-4);
+  font-size: 9px;
+}
+.simulator .metric-value {
+  font-weight: 500;
+  font-size: 23px;
+  letter-spacing: -1px;
+  line-height: 1.4;
+  display: block;
+  color: var(--foreground);
+  margin: 6px 0 8px;
+  overflow-wrap: anywhere;
+}
+.simulator .panel {
+  border: 1px solid var(--sim-line);
+  border-radius: 9px;
+  background: var(--card);
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+.simulator .panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 23px 17px;
+}
+/* A panel that folds: its heading is the summary of a details element. */
+.simulator .panel-fold > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.simulator .panel-fold > summary::-webkit-details-marker {
+  display: none;
+}
+.simulator .panel-fold-mark {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
+  transition: transform 150ms ease-out;
+}
+.simulator .panel-fold > summary:hover .panel-fold-mark {
+  color: var(--foreground);
+}
+.simulator .panel-fold[open] .panel-fold-mark {
+  transform: rotate(90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .simulator .panel-fold-mark {
+    transition: none;
+  }
+}
+.simulator .panel h2 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  margin: 0;
+}
+.simulator .panel-heading div .eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 8px;
+}
+.simulator .panel-heading > .eyebrow {
+  font-size: 8px;
+}
+.simulator .panel-description {
+  margin: 0 23px 18px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.simulator .zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.simulator .zoom-controls button {
+  min-width: 29px;
+  height: 28px;
+  padding: 0 6px;
+  font-size: 15px;
+  border-radius: 4px;
+}
+.simulator .zoom-controls > span {
+  color: var(--sim-ink-4);
+  min-width: 30px;
+  text-align: center;
+  font-family: var(--sim-mono);
+  font-size: 10px;
+}
+.simulator .zoom-controls button.fit-button {
+  font-size: 10px;
+  margin-left: 6px;
+  padding: 0 10px;
+}
+.simulator table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 10px;
+}
+.simulator thead {
+  color: var(--sim-ink-4);
+  font-size: 9px;
+  background: var(--sim-sunken);
+  border-top: 1px solid var(--sim-line-soft);
+  border-bottom: 1px solid var(--sim-line-soft);
+}
+.simulator th,
+.simulator td {
+  padding: 12px 23px;
+  white-space: nowrap;
+}
+.simulator th {
+  font-weight: 500;
+}
+.simulator tbody tr {
+  border-bottom: 1px solid var(--sim-line-soft);
+  color: var(--muted-foreground);
+}
+.simulator tbody tr:last-child {
+  border-bottom: none;
+}
+.simulator tbody th {
+  color: var(--muted-foreground);
+}
+.simulator .numeric {
+  font-size: 10px;
+}
+.simulator .metric.success .metric-value {
+  color: var(--ok);
+}
+.simulator .metric.warning {
+  background: var(--warn-soft);
+}
+.simulator .metric.warning .metric-value {
+  color: var(--warn);
+}
+.simulator tfoot {
+  background: var(--sim-sunken);
+  border-top: 1px solid var(--sim-line);
+}
+.simulator footer {
+  padding: 0 0 25px;
+  color: var(--sim-ink-4);
+  font-size: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.simulator footer a {
+  margin-left: auto;
+  color: var(--sim-ink-4);
+}
+@media (min-width: 1550px) {
+  .simulator main {
+    padding: 42px 48px 0;
+  }
+}
+@media (max-width: 1120px) {
+  .simulator .workspace {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+  .simulator .controls {
+    padding: 24px 15px;
+  }
+  .simulator main {
+    padding: 28px 22px 0;
+  }
+  .simulator .page-heading {
+    align-items: flex-start;
+  }
+  .simulator .page-heading p {
+    max-width: 270px;
+  }
+  .simulator .stage {
+    padding: 15px 12px;
+    gap: 7px;
+  }
+  .simulator .stage h2 {
+    font-size: 10px;
+  }
+  .simulator .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .simulator .metric-value {
+    font-size: 22px;
+  }
+}
+@media (max-width: 760px) {
+  .simulator .workspace {
+    display: flex;
+    flex-direction: column;
+  }
+  .simulator .controls {
+    position: static;
+    height: auto;
+    width: 100%;
+    padding: 18px;
+    border-right: 0;
+    border-bottom: 1px solid var(--sim-line);
+  }
+  .simulator .sidebar-description {
+    margin-bottom: 15px;
+  }
+  .simulator .control-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 20px;
+  }
+  .simulator .control-group h3 {
+    grid-column: 1 / -1;
+  }
+  .simulator .knob-label {
+    font-size: 10px;
+    gap: 5px;
+  }
+  .simulator .knob-input input {
+    width: 64px;
+  }
+  .simulator .timing-groups {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-top: 18px;
+  }
+  .simulator .timing-groups details {
+    border-bottom: 0;
+  }
+  .simulator .timing-groups summary {
+    font-size: 10px;
+  }
+  .simulator .timing-groups summary > span {
+    display: none;
+  }
+  .simulator .sidebar-note {
+    display: none;
+  }
+  .simulator main {
+    padding: 26px 18px 0;
+  }
+  .simulator .page-heading {
+    flex-wrap: wrap;
+    margin-bottom: 21px;
+  }
+  .simulator .page-heading p {
+    max-width: none;
+  }
+  .simulator .stage {
+    padding: 12px 14px;
+  }
+  .simulator .stage:not(:last-child) {
+    border-right: 0;
+    border-bottom: 1px solid var(--sim-line);
+  }
+  .simulator .stage h2 {
+    font-size: 12px;
+  }
+  .simulator .stage p {
+    margin-bottom: 4px;
+  }
+  .simulator .stage div > span {
+    font-size: 9px;
+  }
+  .simulator .summary-grid {
+    gap: 9px;
+  }
+  .simulator .metric {
+    padding: 13px;
+  }
+  .simulator .metric-value {
+    font-size: 20px;
+  }
+  .simulator .metric-label {
+    font-size: 10px;
+  }
+  .simulator .panel-heading {
+    padding: 18px 15px;
+  }
+  .simulator .panel-heading > .eyebrow {
+    display: none;
+  }
+  .simulator .panel h2 {
+    font-size: 14px;
+  }
+  .simulator th,
+  .simulator td {
+    padding: 11px 15px;
+  }
+  .simulator footer {
+    font-size: 8px;
+    gap: 10px;
+  }
+}
+@media (max-width: 390px) {
+  .simulator .control-group {
+    grid-template-columns: 1fr;
+  }
+  .simulator .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .simulator *,
+  .simulator *::before,
+  .simulator *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+.simulator.wave-app .timing-knob .knob-label code {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* A long key such as `ld_window_t` keeps its width, and the label wraps beside it. */
+.simulator.wave-app .knob:not(.timing-knob) .knob-label code {
+  flex-shrink: 0;
+}
+/* The deployed setting of a knob, shown at once when the pointer is on its label. */
+.simulator.wave-app .knob {
+  position: relative;
+}
+.simulator.wave-app .knob-label {
+  cursor: help;
+}
+.simulator.wave-app .knob-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 0;
+  z-index: 6;
+  max-width: 100%;
+  padding: 6px 9px;
+  border-radius: 5px;
+  background: var(--foreground);
+  color: var(--background);
+  font-family: var(--sim-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+  pointer-events: none;
+}
+.simulator.wave-app .knob-label:hover .knob-tooltip {
+  display: block;
+}
+/* Room for a six-digit window in ms beside its unit. */
+.simulator.wave-app .knob:not(.timing-knob) .knob-input input {
+  width: 76px;
+}
+.simulator .limit-alerts {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border: 1px solid color-mix(in oklab, var(--crit) 35%, var(--card));
+  border-left: 4px solid var(--crit);
+  border-radius: 6px;
+  background: var(--crit-soft);
+  color: color-mix(in oklab, var(--crit) 65%, var(--foreground));
+  font-size: 12px;
+  line-height: 1.5;
+}
+.simulator .limit-alerts strong {
+  display: block;
+  font-size: 13px;
+  color: var(--crit);
+}
+.simulator .limit-alerts ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+.simulator .limit-alerts li + li {
+  margin-top: 6px;
+}
+.simulator .limit-alerts li span {
+  display: block;
+  font-weight: 600;
+}
+.simulator.wave-app .knob-invalid .knob-input {
+  border-color: var(--crit);
+  background: var(--crit-soft);
+}
+.simulator.wave-app .knob-invalid .knob-label code {
+  color: var(--crit);
+}
+.simulator.wave-app .wave-tiles {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.simulator .wave-tiles .metric-value {
+  margin-bottom: 6px;
+}
+.simulator .wave-tiles .metric:first-child .metric-value {
+  font-weight: 600;
+  color: var(--foreground);
+}
+.simulator .wave-tiles .metric-value-burst {
+  font-size: 17px;
+  margin-top: 0;
+}
+.simulator .wave-tiles .metric-unit {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--sim-ink-4);
+}
+.simulator .wave-tiles .metric-note {
+  display: block;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--sim-ink-4);
+}
+@media (max-width: 760px) {
+  .simulator.wave-app .wave-tiles {
+    grid-template-columns: 1fr;
+  }
+}
+.simulator.wave-app .wave-tiles {
+  margin-bottom: 12px;
+}
+.simulator .service-breakdown {
+  margin-bottom: 23px;
+  padding: 17px;
+  border: 1px solid var(--sim-line);
+  border-radius: 8px;
+  background: var(--card);
+}
+.simulator .service-breakdown-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 12px;
+}
+.simulator .service-breakdown-heading .metric-note {
+  font-size: 11px;
+  color: var(--sim-ink-4);
+}
+/* Segments sit on the surface with a 2px gap, so neighbours stay apart without a border. */
+.simulator .service-bar {
+  display: flex;
+  gap: 2px;
+  width: 100%;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.simulator .service-bar-large {
+  height: 12px;
+  margin-top: 0;
+  border-radius: 4px;
+}
+.simulator .service-segment {
+  min-width: 2px;
+  flex-basis: 0;
+}
+.simulator .service-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.simulator .service-legend li,
+.simulator .service-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--foreground);
+}
+.simulator .service-legend i,
+.simulator .service-list i {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.simulator .service-legend .service-cost,
+.simulator .service-list .service-cost {
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.simulator .service-legend .service-share,
+.simulator .service-list .service-share {
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--sim-ink-4);
+}
+.simulator .service-legend .service-unit {
+  margin-left: -3px;
+  font-size: 11px;
+  color: var(--sim-ink-4);
+}
+.simulator .service-legend li.service-free {
+  opacity: 0.45;
+}
+.simulator .email-charges .service-list {
+  margin: 8px 0 0;
+  padding: 0 0 0 10px;
+  list-style: none;
+}
+.simulator .email-charges .service-list li {
+  gap: 6px;
+  font-size: 10.5px;
+}
+.simulator .email-charges .service-list .service-cost {
+  margin-left: auto;
+  font-weight: 500;
+}
+.simulator .email-charges .service-list .service-share {
+  min-width: 38px;
+  text-align: right;
+}
+.simulator .email-charges {
+  width: 100%;
+  table-layout: fixed;
+  margin: 0 0 28px;
+  font-size: 12px;
+  border-top: 1px solid var(--sim-line);
+}
+.simulator .email-charges col.charge-step {
+  width: 25%;
+}
+.simulator .email-charges col.charge-time {
+  width: 17%;
+}
+.simulator .email-charges col.charge-price {
+  width: 29%;
+}
+.simulator .email-charges th,
+.simulator .email-charges td {
+  padding: 14px 16px;
+}
+.simulator .email-charges thead tr.charge-title th {
+  padding: 16px 16px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.simulator .email-charges thead tr:not(.charge-title) th {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--sim-line);
+  background: var(--sim-sunken);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  vertical-align: bottom;
+}
+.simulator .email-charges thead th span {
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sim-ink-4);
+}
+.simulator .email-charges caption {
+  caption-side: bottom;
+  padding: 10px 16px 0;
+  line-height: 1.5;
+  text-align: left;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.simulator .email-charges tbody tr {
+  border-bottom: 1px solid var(--sim-line-soft);
+}
+.simulator .email-charges tbody tr.charge-open {
+  border-bottom: 0;
+}
+.simulator .email-charges tbody tr.charge-line:hover,
+.simulator .email-charges tbody tr.charge-line.charge-open,
+.simulator .email-charges tbody tr.charge-line.charge-open + tr.charge-detail {
+  background: var(--card);
+}
+.simulator .email-charges tbody tr.charge-row th,
+.simulator .email-charges tbody tr.charge-row td {
+  padding-top: 11px;
+  padding-bottom: 11px;
+  vertical-align: baseline;
+}
+.simulator .email-charges tbody th {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--foreground);
+  white-space: normal;
+}
+.simulator .email-charges tbody th span.charge-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.simulator .email-charges tbody tr.charge-row .charge-toggle svg {
+  color: var(--sim-ink-5);
+}
+.simulator .email-charges tbody tr.charge-detail th,
+.simulator .email-charges tbody tr.charge-detail td {
+  padding-top: 0;
+  padding-bottom: 14px;
+  vertical-align: top;
+}
+.simulator .email-charges tbody tr.charge-detail th {
+  padding-left: 34px;
+  font-weight: 400;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+.simulator .email-charges .charge-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.simulator .email-charges .charge-toggle svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s;
+}
+.simulator .email-charges .charge-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .simulator .email-charges .charge-toggle svg {
+    transition: none;
+  }
+}
+.simulator .email-charges .charge-toggle[aria-expanded='true'] svg {
+  transform: rotate(90deg);
+}
+.simulator .charge-warning {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+.simulator .email-charges .charge-warning-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--warn);
+  cursor: help;
+}
+.simulator .email-charges .charge-warning-icon svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.simulator .email-charges .charge-warning-tooltip {
+  display: none;
+  margin: 0;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 6;
+  width: min(340px, 70vw);
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--foreground);
+  color: var(--background);
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-line;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+}
+.simulator .charge-warning:hover .charge-warning-tooltip,
+.simulator .charge-warning:focus-within .charge-warning-tooltip {
+  display: block;
+}
+.simulator .email-charges td {
+  overflow-wrap: anywhere;
+  color: var(--foreground);
+  white-space: normal;
+  vertical-align: top;
+}
+.simulator .email-charges .charge-value {
+  display: block;
+  white-space: nowrap;
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--foreground);
+}
+.simulator .email-charges .charge-value .charge-zeros {
+  font-weight: 400;
+  color: var(--sim-ink-5);
+}
+.simulator .email-charges .charge-formula {
+  display: block;
+  padding: 1px 0 1px 10px;
+  border-left: 2px solid var(--sim-line);
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--sim-ink-5);
+}
+.simulator .email-charges .charge-formula code {
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--muted-foreground);
+}
+.simulator .email-charges .charge-formula span {
+  display: block;
+  margin-top: 4px;
+  white-space: pre-line;
+}
+.simulator .email-charges tbody tr.charge-total {
+  border-bottom: 0;
+}
+.simulator .email-charges tbody tr.charge-total th,
+.simulator .email-charges tbody tr.charge-total td {
+  background: var(--live-soft);
+  color: var(--foreground);
+}
+.simulator .email-charges tbody tr.charge-row.charge-total th,
+.simulator .email-charges tbody tr.charge-row.charge-total td {
+  border-top: 2px solid var(--input);
+}
+.simulator .email-charges tbody tr.charge-total th {
+  font-size: 13px;
+  font-weight: 700;
+}
+.simulator .email-charges tbody tr.charge-total .charge-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.simulator .email-charges tbody tr.charge-total .charge-value .charge-zeros {
+  color: var(--sim-accent-line);
+}
+.simulator .email-charges tbody tr.charge-total .charge-formula {
+  border-left-color: var(--sim-accent-line);
+}
+.simulator .wave-transport {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 0 8px;
+}
+.simulator .wave-transport-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.simulator .wave-transport .transport {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 999px;
+  color: var(--foreground);
+  border-color: var(--sim-line);
+  background: var(--card);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 4%);
+}
+.simulator .wave-transport .transport svg {
+  width: 11px;
+  height: 11px;
+  display: block;
+  fill: currentColor;
+}
+.simulator .wave-transport .transport:hover:not(:disabled) {
+  background: var(--sim-sunken);
+  border-color: var(--input);
+  color: var(--foreground);
+}
+.simulator .wave-transport .transport:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.simulator .wave-transport .transport-play {
+  width: 28px;
+  height: 28px;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 4px 10px color-mix(in oklab, var(--primary) 20%, transparent);
+}
+.simulator .wave-transport .transport-play svg {
+  width: 12px;
+  height: 12px;
+}
+.simulator .wave-transport .transport-play .icon-play {
+  transform: translateX(1px);
+}
+.simulator .wave-transport .transport-play:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--primary) 88%, var(--foreground));
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+.simulator .wave-clock {
+  justify-self: start;
+  margin-left: 12px;
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--sim-ink-2);
+}
+.simulator .panel.wave-panel {
+  overflow: visible;
+}
+.simulator .wave-board {
+  position: relative;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--sim-line);
+}
+.simulator .wave-cursor {
+  position: absolute;
+  z-index: 2;
+  width: 1px;
+  background: repeating-linear-gradient(to bottom, var(--sim-ink-2) 0 4px, transparent 4px 8px);
+  pointer-events: none;
+}
+.simulator .wave-ruler {
+  position: sticky;
+  top: calc(68px + var(--sim-float));
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  background: color-mix(in oklab, var(--card) 93%, transparent);
+  border-bottom: 1px solid var(--sim-line);
+  box-shadow: 0 10px 18px rgb(0 0 0 / 8%);
+}
+.simulator .wave-zoom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-right: 1px solid var(--sim-line);
+}
+.simulator .wave-zoom .zoom-controls button {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+}
+.simulator .wave-zoom .zoom-controls > span {
+  min-width: 5ch;
+}
+.simulator .wave-zoom .zoom-controls button.fit-button {
+  margin-left: 2px;
+  padding: 0 6px;
+}
+.simulator .wave-bar-time {
+  fill: var(--sim-ink-2);
+  stroke: var(--card);
+  stroke-width: 3px;
+  paint-order: stroke;
+  font-family: var(--sim-mono);
+  font-size: 11px;
+  pointer-events: none;
+}
+.simulator .wave-release {
+  font-family: var(--sim-mono);
+  font-size: 10px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.simulator .wave-ruler-labels {
+  position: relative;
+  height: 16px;
+  margin: 8px 12px 0;
+}
+.simulator .wave-ruler-tick {
+  position: absolute;
+  top: 0;
+  font-family: var(--sim-mono);
+  font-size: 10px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.simulator .wave-ruler-tick-start {
+  transform: translateX(0);
+}
+.simulator .wave-ruler-tick-middle {
+  transform: translateX(-50%);
+}
+.simulator .wave-ruler-tick-end {
+  transform: translateX(-100%);
+}
+.simulator .wave-ruler-track {
+  position: relative;
+  height: 18px;
+  margin: 6px 12px 8px;
+  border-radius: 9px;
+  background: var(--sim-line-soft);
+  cursor: pointer;
+}
+.simulator .wave-ruler-thumb {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  z-index: 1;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--sim-ink-5);
+  cursor: grab;
+}
+.simulator .wave-ruler-thumb:active {
+  cursor: grabbing;
+}
+.simulator .wave-ruler-handle {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid var(--card);
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  touch-action: none;
+}
+.simulator .wave-ruler-handle:hover:not(:disabled) {
+  background: var(--primary);
+}
+.simulator .wave-ruler-handle:active {
+  cursor: grabbing;
+}
+.simulator .wave-ruler-start,
+.simulator .wave-ruler-end {
+  z-index: 1;
+  padding: 0 3px;
+  font-weight: 600;
+  background: color-mix(in oklab, var(--card) 93%, transparent);
+}
+.simulator .wave-ruler-start {
+  color: var(--foreground);
+}
+.simulator .wave-ruler-end {
+  color: var(--sim-range);
+}
+.simulator .wave-ruler-start-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--foreground);
+  transform: translateX(-0.5px);
+  pointer-events: none;
+  z-index: 2;
+}
+.simulator .wave-ruler-start-mark::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -4px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid var(--foreground);
+}
+.simulator .wave-start-guide,
+.simulator .wave-end-guide {
+  position: fixed;
+  z-index: 7;
+  width: 0;
+  transform: translateX(-0.5px);
+  pointer-events: none;
+}
+.simulator .wave-start-guide {
+  border-left: 1px dashed var(--foreground);
+}
+.simulator .wave-end-guide {
+  border-left: 1px dashed var(--sim-range);
+}
+.simulator .wave-span-callout {
+  position: fixed;
+  z-index: 6;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--sim-range);
+  border-bottom: 1px solid var(--sim-range);
+  background: var(--sim-range-soft);
+  color: var(--sim-range);
+  font-family: var(--sim-mono);
+  font-size: 11px;
+  line-height: 1.25;
+  pointer-events: none;
+  overflow: hidden;
+}
+.simulator .wave-span-callout b {
+  font-weight: 600;
+}
+.simulator .wave-lane {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  border-bottom: 1px solid var(--sim-line);
+}
+.simulator .wave-lane-label {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  padding: 16px 18px;
+  border-right: 1px solid var(--sim-line);
+  background: var(--sim-sunken);
+}
+.simulator .wave-lane-label span {
+  font-family: var(--sim-mono);
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.simulator .wave-lane-label strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.simulator .wave-lane-label em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+/* A handler lane can be very tall. Its title stays at the top, under the ruler, so the toggle is always in reach. */
+.simulator .wave-lane-label-top {
+  align-content: stretch;
+}
+.simulator .wave-lane-head {
+  position: sticky;
+  top: calc(141px + var(--sim-float));
+  align-self: start;
+  display: grid;
+  gap: 4px;
+}
+.simulator .wave-plot {
+  position: relative;
+  min-width: 0;
+  padding: 8px 12px 4px;
+}
+.simulator .wave-plot-clip {
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 0;
+  cursor: grab;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  user-select: none;
+  scrollbar-width: none;
+}
+.simulator .wave-plot-clip::-webkit-scrollbar {
+  display: none;
+}
+.simulator .wave-plot-clip:active {
+  cursor: grabbing;
+}
+.simulator .wave-shift {
+  min-width: 100%;
+}
+.simulator .wave-tip {
+  position: absolute;
+  z-index: 3;
+  width: max-content;
+  max-width: 240px;
+  padding: 8px 10px;
+  border: 1px solid var(--sim-line);
+  border-radius: 6px;
+  background: var(--card);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 9%);
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 12px));
+}
+.simulator .wave-tip-start {
+  transform: translate(0, calc(-100% - 12px));
+}
+.simulator .wave-tip-end {
+  transform: translate(-100%, calc(-100% - 12px));
+}
+.simulator .wave-tip-below.wave-tip-center {
+  transform: translate(-50%, 14px);
+}
+.simulator .wave-tip-below.wave-tip-start {
+  transform: translate(0, 14px);
+}
+.simulator .wave-tip-below.wave-tip-end {
+  transform: translate(-100%, 14px);
+}
+.simulator .wave-tip strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.simulator .wave-tip i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.simulator .wave-tip span,
+.simulator .wave-tip p {
+  margin: 3px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+.simulator .wave-tip span {
+  display: block;
+  font-family: var(--sim-mono);
+}
+.simulator .wave-plot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: inherit;
+}
+.simulator .wave-plot svg:focus {
+  outline: 2px solid color-mix(in oklab, var(--ring) 50%, transparent);
+  outline-offset: 2px;
+}
+.simulator .wave-hidden {
+  margin: 28px 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--warn);
+}
+.simulator .source-tank {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+}
+.simulator .source-tank-arrival {
+  position: absolute;
+  left: 20px;
+  bottom: 4px;
+  margin: 0;
+  font-family: var(--sim-mono);
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--primary);
+  pointer-events: none;
+}
+.simulator .source-tank-vessel {
+  width: 46px;
+  height: 88px;
+  border: 1px solid var(--sim-line);
+  border-radius: 8px 8px 6px 6px;
+  background: var(--sim-sunken);
+  position: relative;
+  overflow: hidden;
+}
+.simulator .source-tank-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--sim-tone-source);
+}
+.simulator .email-tank .source-tank-fill {
+  background: var(--sim-tone-email);
+}
+.simulator .source-tank p {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+.simulator .source-tank strong {
+  font-size: 32px;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.simulator .source-tank span {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+@media (max-width: 760px) {
+  .simulator .wave-lane {
+    grid-template-columns: 1fr;
+  }
+  .simulator .wave-ruler {
+    grid-template-columns: 1fr;
+    top: 120px;
+  }
+  .simulator .wave-zoom {
+    justify-content: flex-end;
+    padding: 8px 12px 0;
+    border-right: 0;
+  }
+  .simulator .wave-lane-label {
+    border-right: 0;
+    border-bottom: 1px solid var(--sim-line);
+  }
+  .simulator .wave-lane-head {
+    position: static;
+  }
+  .simulator .wave-transport {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 8px;
+    padding: 0 16px 12px;
+  }
+  .simulator .wave-clock {
+    margin-left: 0;
+  }
+}
+.simulator .wave-lane-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 2px;
+  margin-left: -14px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+.simulator .wave-lane-toggle:hover:not(:disabled) {
+  background: transparent;
+}
+.simulator .wave-lane-toggle svg {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: var(--sim-ink-5);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s;
+}
+.simulator .wave-lane-toggle:hover svg {
+  stroke: var(--sim-ink-2);
+}
+.simulator .wave-lane-toggle[aria-expanded='true'] svg {
+  transform: rotate(90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .simulator .wave-lane-toggle svg {
+    transition: none;
+  }
+}
+.simulator .wave-swarm-name {
+  fill: var(--muted-foreground);
+  font-family: var(--sim-mono);
+  font-size: 11px;
+}
+.simulator .swarm-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+.simulator .swarm-tiles div {
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--sim-line);
+  border-radius: 6px;
+  background: var(--card);
+}
+.simulator .swarm-tiles dt {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.simulator .swarm-tiles dd {
+  margin: 2px 0 0;
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.simulator .swarm-tiles span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--muted-foreground);
+}
+.simulator .swarm-tiles code {
+  font-size: 10.5px;
+}
+@media (max-width: 760px) {
+  .simulator .swarm-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .simulator .wave-lane-toggle {
+    margin-left: 0;
+  }
+}
+/* A price as terms: each value sits above its symbol. The left edge of a term has the color of its service. */
+.simulator .email-charges .price-terms {
+  padding-left: 0;
+  border-left: 0;
+}
+.simulator .email-charges .price-terms span {
+  margin-top: 0;
+  white-space: nowrap;
+}
+.simulator .email-charges .price-terms .price-term {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  column-gap: 6px;
+  align-items: start;
+  padding: 3px 0 3px 8px;
+  border-left: 2px solid transparent;
+}
+.simulator .email-charges .price-terms .price-term + .price-term {
+  margin-top: 2px;
+}
+.simulator .email-charges .price-terms .term-operator {
+  display: block;
+  color: var(--sim-ink-5);
+}
+.simulator .email-charges .price-terms .term-factors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px 6px;
+}
+.simulator .email-charges .price-terms .term-factor {
+  display: inline-flex;
+  gap: 6px;
+}
+.simulator .email-charges .price-terms .term-pair {
+  display: inline-flex;
+  flex-direction: column;
+}
+.simulator .email-charges .price-terms .term-value {
+  display: block;
+  color: var(--foreground);
+}
+.simulator .email-charges .price-terms .term-symbol {
+  display: block;
+  font-family: inherit;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--sim-ink-4);
+}
+.simulator .email-charges .price-terms .term-times {
+  display: block;
+  color: var(--sim-ink-5);
+}
+.simulator .email-charges .price-terms .term-result {
+  display: block;
+  text-align: right;
+  color: var(--muted-foreground);
+}
+.simulator .email-charges .price-terms .price-term-sum {
+  margin-top: 4px;
+  padding-top: 5px;
+  border-top: 1px solid var(--sim-line);
+}
+.simulator .email-charges .price-terms .term-sum {
+  display: block;
+  font-weight: 600;
+  color: var(--foreground);
+}
+/* A unit such as ms/MB stays on one line beside its input. */
+.simulator.wave-app .knob-input > span {
+  white-space: nowrap;
+}
+
+/* A compared request: the model goes dim, the real runs and counts keep full ink. */
+.simulator .wave-dim {
+  opacity: 0.32;
+}
+.simulator .wave-part-name {
+  fill: var(--muted-foreground);
+  font-family: var(--sim-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.simulator .wave-part-real {
+  fill: var(--sim-real);
+  font-weight: 600;
+}
+.simulator .swarm-tiles .swarm-tile-real {
+  color: var(--sim-real);
+}
+.simulator .source-tank-model {
+  opacity: 0.3;
+}
+.simulator .source-tank-real {
+  left: 25%;
+  right: 25%;
+  background: var(--sim-real);
+}
+.simulator .source-tank .source-tank-model-count {
+  font-size: 11px;
+  color: var(--sim-ink-4);
+}
+.simulator .compare-panel {
+  padding-bottom: 18px;
+}
+.simulator .compare-field {
+  padding: 0 23px;
+}
+.simulator .compare-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+.simulator .compare-form label {
+  display: grid;
+  flex: 1 1 320px;
+  min-width: 0;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.simulator .compare-form textarea {
+  /* One line for one ID, then the field scrolls. The browser sets the height from the content. */
+  field-sizing: content;
+  min-height: 35px;
+  max-height: 150px;
+  min-width: 0;
+  padding: 8px 10px;
+  resize: none;
+  line-height: 1.5;
+  border: 1px solid var(--input);
+  border-radius: 5px;
+  background: var(--card);
+  color: var(--foreground);
+  font-family: var(--sim-mono);
+  font-size: 12px;
+}
+.simulator .compare-form button {
+  height: 35px;
+}
+.simulator .compare-status {
+  display: block;
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+.simulator .compare-status-error {
+  color: var(--crit);
+}
+.simulator .compare-status-ready {
+  font-family: var(--sim-mono);
+  color: var(--sim-real);
+}
+.simulator .compare-table {
+  width: calc(100% - 46px);
+  margin: 20px 23px 0;
+  font-size: 12px;
+  border-collapse: collapse;
+}
+.simulator .compare-table caption {
+  caption-side: bottom;
+  padding: 8px 0 0;
+  text-align: left;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.simulator .compare-table th,
+.simulator .compare-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--sim-line-soft);
+  text-align: left;
+  vertical-align: top;
+}
+.simulator .compare-table thead th {
+  background: var(--sim-sunken);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+.simulator .compare-table tbody th {
+  font-weight: 600;
+}
+.simulator .compare-table .compare-total th,
+.simulator .compare-table .compare-total td {
+  border-top: 1px solid var(--sim-line);
+}
+.simulator .compare-real {
+  display: block;
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--sim-real);
+}
+/* The color of a real value against its model. These come after the base colors, so that they win. */
+.simulator .compare-better,
+.simulator .compare-table .compare-better {
+  color: var(--ok);
+}
+.simulator .compare-worse,
+.simulator .compare-table .compare-worse {
+  color: var(--sim-real);
+}
+.simulator .compare-same,
+.simulator .compare-table .compare-same {
+  color: var(--foreground);
+}
+/* No value to compare. */
+.simulator .compare-none,
+.simulator .compare-table .compare-none {
+  color: var(--sim-ink-4);
+}
+.simulator .compare-model {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--sim-mono);
+  font-size: 11px;
+  color: var(--sim-ink-4);
+}
+.simulator .compare-model b {
+  margin-left: 6px;
+  font-weight: 600;
+  color: var(--sim-ink-2);
+}
+.simulator .compare-number {
+  font-family: var(--sim-mono);
+  font-variant-numeric: tabular-nums;
+}
+.simulator .compare-service th {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.simulator .compare-service i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+/* The compare panel in three parts that read as one card, so that the bar can float past the end of the panel. */
+.simulator .compare-panel-top {
+  margin-bottom: 0;
+  padding-bottom: 12px;
+  border-bottom: 0;
+  border-radius: 9px 9px 0 0;
+}
+.simulator .compare-panel-rest {
+  border-top: 0;
+  border-radius: 0 0 9px 9px;
+}
+.simulator .compare-bar {
+  /* Above the ruler and the guides of the timeline, and under the app header. */
+  position: sticky;
+  top: 68px;
+  z-index: 8;
+  container-type: scroll-state;
+}
+/* The bar is the last part when all the reads failed. */
+.simulator .compare-bar:not(:has(+ .compare-panel-rest)) {
+  margin-bottom: 22px;
+}
+.simulator .compare-bar-body {
+  padding: 2px 23px 12px;
+  border: solid var(--sim-line);
+  border-width: 0 1px 1px;
+  background: var(--card);
+}
+@container scroll-state(stuck: top) {
+  .simulator .compare-bar-body {
+    box-shadow: 0 10px 18px rgb(0 0 0 / 12%);
+  }
+}
+.simulator .compare-bar .compare-status {
+  margin-top: 0;
+}
+.simulator .compare-bar .compare-pick,
+.simulator .compare-bar .compare-facts {
+  margin: 8px 0 0;
+}
+@media (max-width: 760px) {
+  .simulator .compare-bar {
+    position: static;
+  }
+}
+.simulator .compare-pick {
+  margin: 14px 23px 0;
+}
+.simulator .compare-pick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.simulator .compare-pick button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.simulator .compare-pick button b {
+  font-family: var(--sim-mono);
+  font-weight: 600;
+  color: var(--sim-ink-2);
+}
+.simulator .compare-pick button[aria-pressed='true'] {
+  border-color: var(--sim-real);
+  color: var(--foreground);
+}
+.simulator .compare-pick-gap {
+  border-style: dashed;
+}
+.simulator .compare-pick p {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.simulator .compare-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 14px 23px 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.simulator .compare-facts b {
+  font-family: var(--sim-mono);
+  font-weight: 600;
+  color: var(--foreground);
+}
+.simulator .compare-measure-head,
+.simulator .compare-row-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.simulator .compare-row-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.simulator .compare-service-row th {
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.simulator .compare-row-name i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.simulator .compare-switch {
+  display: inline-flex;
+  flex: none;
+  padding: 1px;
+  border-radius: 5px;
+  background: var(--sim-sunken);
+}
+.simulator .compare-table thead .compare-row-head {
+  align-items: center;
+}
+/* The head of a table is as dark as the switch, so the switch of a column takes the color of a card. */
+.simulator .compare-table thead .compare-switch {
+  background: var(--card);
+}
+.simulator .compare-table thead .compare-switch button[aria-pressed='true'] {
+  background: var(--sim-sunken);
+}
+.simulator .compare-switch button {
+  padding: 0 5px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font-family: var(--sim-mono);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--sim-ink-4);
+}
+.simulator .compare-switch button:hover {
+  color: var(--foreground);
+}
+.simulator .compare-switch button[aria-pressed='true'] {
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--sim-line);
+}
+.simulator .compare-range {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--sim-mono);
+  font-size: 10px;
+  color: var(--sim-ink-4);
+}
+.simulator .compare-each {
+  display: grid;
+  gap: 2px;
+  margin: 4px 0 0;
+  padding: 0;
+  font-family: var(--sim-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.simulator .compare-each li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+.simulator .compare-each b {
+  font-weight: 600;
+  color: var(--sim-ink-2);
+}
+.simulator .compare-place {
+  min-width: 2.5ch;
+  color: var(--sim-ink-4);
+}
+.simulator .compare-each-real {
+  color: var(--sim-real);
+}
+.simulator .compare-each-model {
+  color: var(--sim-ink-4);
+}
+/* A value of a request outside the summary shows, but it does not read as part of the median. */
+.simulator .compare-each-out {
+  opacity: 0.5;
+}
+.simulator .compare-notes {
+  display: grid;
+  gap: 6px;
+  margin: 18px 23px 0;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+.simulator .compare-note span {
+  display: inline-block;
+  min-width: 64px;
+  margin-right: 8px;
+  font-family: var(--sim-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.simulator .compare-note-error {
+  color: var(--crit);
+}
+.simulator .compare-note-limit span {
+  color: var(--warn);
+}
+@media (max-width: 760px) {
+  .simulator .compare-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

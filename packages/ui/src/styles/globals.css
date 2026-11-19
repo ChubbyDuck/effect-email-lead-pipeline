@@ -1,0 +1,125 @@
+/*
+ * The theme of the leads apps: the lab and the dashboard import this one stylesheet (`@leads/ui/globals.css`), so that
+ * they look the same. Each app imports Tailwind before this file.
+ */
+
+/* The shadcn components of the kit. Tailwind must see their classes in every app. */
+@source '../components';
+
+/* The apps follow the color scheme of the system. */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+@theme inline {
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-live: var(--live);
+  --color-live-soft: var(--live-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-crit: var(--crit);
+  --color-crit-soft: var(--crit-soft);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Steel and plate: the chrome stays quiet, so that the health colors carry the meaning. */
+:root {
+  --radius: 0.375rem;
+  --background: #edf0f3;
+  --foreground: #18212c;
+  --card: #fafbfc;
+  --card-foreground: #18212c;
+  --popover: #fafbfc;
+  --popover-foreground: #18212c;
+  --primary: #2d5bd3;
+  --primary-foreground: #f5f8ff;
+  --secondary: #e3e8ed;
+  --secondary-foreground: #18212c;
+  --muted: #e6eaee;
+  --muted-foreground: #5c6876;
+  --accent: #e3e8ed;
+  --accent-foreground: #18212c;
+  --destructive: #c2352b;
+  --destructive-foreground: #fff6f5;
+  --border: #d3dae1;
+  --input: #c7cfd8;
+  --ring: #2d5bd3;
+  --ok: #1e7a52;
+  --ok-soft: #dcefe5;
+  --live: #2d5bd3;
+  --live-soft: #e0e8fb;
+  --warn: #a35f00;
+  --warn-soft: #f8ebd4;
+  --crit: #c2352b;
+  --crit-soft: #fae1de;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #141a21;
+    --foreground: #dde4eb;
+    --card: #1b222b;
+    --card-foreground: #dde4eb;
+    --popover: #1b222b;
+    --popover-foreground: #dde4eb;
+    --primary: #7fa2f5;
+    --primary-foreground: #101722;
+    --secondary: #252e39;
+    --secondary-foreground: #dde4eb;
+    --muted: #222a34;
+    --muted-foreground: #8e9aa8;
+    --accent: #252e39;
+    --accent-foreground: #dde4eb;
+    --destructive: #ff8b80;
+    --destructive-foreground: #2a1110;
+    --border: #2a333e;
+    --input: #343e4a;
+    --ring: #7fa2f5;
+    --ok: #5ccb92;
+    --ok-soft: #173326;
+    --live: #7fa2f5;
+    --live-soft: #1c2945;
+    --warn: #edb051;
+    --warn-soft: #382a12;
+    --crit: #ff8b80;
+    --crit-soft: #41191a;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: light dark;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 14px;
+    line-height: 1.45;
+    font-variant-numeric: tabular-nums;
+  }
+}

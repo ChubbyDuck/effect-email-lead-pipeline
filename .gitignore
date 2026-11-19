@@ -1,0 +1,29 @@
+docs/**/*.pdf
+tools/bench/results/
+tools/generator/output/
+
+# Dependencies and build output
+node_modules/
+dist/
+dist-e2e/
+.output/
+cdk.out/
+.alchemy/
+coverage/
+.turbo/
+*.tsbuildinfo
+docs/pipeline-video/target/
+
+# Local files
+.env
+.env.*
+.DS_Store
+.idea/
+.claude/settings.local.json
+.claude/worktrees/
+.vite/
+
+# The values of the real AWS project of the owner (ADR 0004). See deployments.local.example.json.
+deployments.local.json
+AGENTS.local.md
+.playwright-mcp/

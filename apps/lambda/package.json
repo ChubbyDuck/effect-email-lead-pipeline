@@ -1,0 +1,48 @@
+{
+  "name": "@leads/lambda",
+  "version": "0.0.1",
+  "private": true,
+  "description": "The Lambda runtime of the pipeline: the three handlers and their bundles.",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./src/*",
+      "./src/*.ts",
+      "./src/*.tsx",
+      "./src/*/index.ts"
+    ]
+  },
+  "exports": {
+    "./bundle": "./src/bundle.ts",
+    "./e2e/control": "./src/Entrypoints/LambdaE2E/control.ts",
+    "./events/s3": "./src/Entrypoints/Lambda/s3Event.ts",
+    "./events/sqs": "./src/Entrypoints/Lambda/sqsEvent.ts"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "build:e2e": "node build-e2e.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-appconfigdata": "catalog:",
+    "@aws-sdk/client-dynamodb": "catalog:",
+    "@aws-sdk/client-s3": "catalog:",
+    "@aws-sdk/client-sqs": "catalog:",
+    "@aws-sdk/lib-dynamodb": "catalog:",
+    "@leads/pipeline": "workspace:*",
+    "@leads/shared": "workspace:*",
+    "effect": "catalog:",
+    "mailparser": "^3.14.5"
+  },
+  "devDependencies": {
+    "@leads/typescript-config": "workspace:*",
+    "@leads/vitest-config": "workspace:*",
+    "@types/aws-lambda": "^8.10.163",
+    "@types/mailparser": "^3.9.0",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

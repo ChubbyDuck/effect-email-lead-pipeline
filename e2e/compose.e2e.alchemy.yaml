@@ -1,0 +1,13 @@
+# The Floci of the e2e suite on Alchemy (`test-e2e-floci.sh alchemy`). It runs the Floci image of Alchemy: the image of
+# the repo (compose.e2e.yaml) lacks `DescribeContributorInsights`, which `DynamoDB.Table` calls (spec 0005).
+services:
+  floci:
+    image: ghcr.io/alchemy-run/floci:2.4.0-alchemy.3@sha256:c9e87d338c8a7be6fa131451961a8baa1e0f9f6312b5aea44a00f12472d5bd85
+    ports:
+      - '127.0.0.1:${FLOCI_E2E_PORT:-4569}:4566'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      FLOCI_SERVICES_CLOUDFRONT_EDGE_PORTS_ENABLED: 'false'
+      FLOCI_SERVICES_DOCKER_NETWORK: '${FLOCI_E2E_PROJECT:-leads-e2e-alchemy}_default'
+      FLOCI_SERVICES_LAMBDA_CONTAINER_NAME_PREFIX: '${FLOCI_E2E_PROJECT:-leads-e2e-alchemy}'

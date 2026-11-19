@@ -1,0 +1,61 @@
+{
+  "name": "leads",
+  "version": "0.0.1",
+  "private": true,
+  "description": "An email-to-orders pipeline on AWS Lambda, S3, and SQS, built with Effect in a hexagonal architecture.",
+  "license": "MIT",
+  "author": "Konstantin Sokolovskyi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChubbyDuck/effect-email-lead-pipeline.git"
+  },
+  "type": "module",
+  "scripts": {
+    "prepare": "effect-tsgo patch --no-typescript --oxlint",
+    "typecheck": "turbo run typecheck",
+    "lint": "oxlint . && sherif",
+    "test": "turbo run test",
+    "test:integration": "sh scripts/test-integration.sh",
+    "test:e2e:floci": "turbo run test:e2e --filter=@leads/e2e",
+    "test:e2e:alchemy": "turbo run test:e2e:alchemy --filter=@leads/e2e",
+    "infra:synth": "DEPLOYMENT=${DEPLOYMENT:-production-cdk} turbo run synth --filter=@leads/cdk",
+    "infra:diff": "node scripts/infra.mjs diff",
+    "infra:deploy": "node scripts/infra.mjs deploy",
+    "infra:destroy": "node scripts/infra.mjs destroy",
+    "infra:deploy:floci": "node scripts/infra.mjs deploy:floci",
+    "infra:mail:diff": "turbo run mail:diff --filter=@leads/alchemy",
+    "infra:mail:deploy": "turbo run mail:deploy --filter=@leads/alchemy",
+    "infra:smoke:floci": "turbo run smoke:floci --filter=@leads/e2e",
+    "infra:smoke:alchemy": "turbo run smoke:alchemy --filter=@leads/e2e",
+    "floci:up": "docker compose -f compose.integration.yaml up -d",
+    "floci:down": "docker compose -f compose.integration.yaml down",
+    "floci:alchemy:up": "sh scripts/floci-local-alchemy.sh up",
+    "floci:alchemy:down": "sh scripts/floci-local-alchemy.sh down",
+    "lab": "DEPLOYMENT=${DEPLOYMENT:-production-cdk} turbo run dev --filter=@leads/lab",
+    "lab:local": "node scripts/local.mjs dev --filter=@leads/lab",
+    "dashboard": "DEPLOYMENT=${DEPLOYMENT:-production-cdk} turbo run dev --filter=@leads/dashboard",
+    "dashboard:local": "node scripts/local.mjs dev --filter=@leads/dashboard",
+    "gen": "turbo run gen --filter=@leads/generator --",
+    "send": "turbo run send --filter=@leads/generator --",
+    "send:local": "node scripts/local.mjs send --filter=@leads/generator --",
+    "send:production": "DEPLOYMENT=production-cdk turbo run send --filter=@leads/generator --",
+    "catalog": "turbo run catalog --filter=@leads/generator --",
+    "mail": "turbo run mail --filter=@leads/generator --",
+    "bench:lead-sources-memory": "turbo run bench:lead-sources-memory --filter=@leads/bench --",
+    "format:changed": "node scripts/format-changed.mjs"
+  },
+  "devDependencies": {
+    "@effect/tsgo": "0.37.0",
+    "@shadcn/lint": "^0.2.0",
+    "oxfmt": "^0.79.0",
+    "oxlint": "1.80.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "sherif": "^1.13.0",
+    "turbo": "^2.10.4",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.5.1"
+}

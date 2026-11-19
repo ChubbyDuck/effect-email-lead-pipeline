@@ -1,0 +1,33 @@
+{
+  "name": "@leads/bench",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Benchmarks of the pipeline.",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./src/*",
+      "./src/*.ts",
+      "./src/*.tsx",
+      "./src/*/index.ts"
+    ]
+  },
+  "scripts": {
+    "bench:lead-sources-memory": "tsx src/leadSourcesMemory/run.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sqs": "catalog:",
+    "@leads/pipeline": "workspace:*",
+    "@leads/shared": "workspace:*",
+    "effect": "catalog:",
+    "vite": "catalog:",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.1/xlsx-0.20.1.tgz"
+  },
+  "devDependencies": {
+    "@leads/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "tsx": "4.23.15",
+    "typescript": "catalog:"
+  }
+}

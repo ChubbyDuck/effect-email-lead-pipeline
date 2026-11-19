@@ -1,0 +1,14 @@
+{
+  "production-cdk": {
+    "account": "123456789012",
+    "inboxAddress": "noreply@cdk.ses.example.com",
+    "prefix": "example-leads",
+    "senderWhitelist": ["owner@example.com"]
+  },
+  "production-alchemy": {
+    "account": "123456789012",
+    "inboxAddress": "noreply@alchemy.ses.example.com",
+    "prefix": "example-leads-alchemy",
+    "senderWhitelist": ["owner@example.com"]
+  }
+}
