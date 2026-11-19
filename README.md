@@ -35,11 +35,12 @@ Clone and explore this repo to see concrete, tested answers to questions like:
 
 1. [Try it locally in 3 minutes](#try-it-locally-in-3-minutes) — run the tests and the entire AWS pipeline on your machine.
 2. [The real-world scenario](#the-real-world-scenario) — domain language, stage flow, security, and failure outcomes.
-3. [Effect 4 showcase: 8 real patterns](#effect-4-showcase-8-real-patterns) — annotated excerpts straight from the codebase.
-4. [Architecture at a glance](#architecture-at-a-glance) — hexagons, enforced boundaries, packages, and the two web apps.
-5. [15-minute guided code tour](#15-minute-guided-code-tour) — the exact files to read in order if you are new here.
-6. [Four-level test pyramid](#four-level-test-pyramid) — from pure fake-port unit tests to full-stack E2E with fault injection.
-7. [Deployments, AWS setup, and reference](#deployments-aws-setup-and-reference) — deploying to real AWS and deep operational specs.
+3. [Inside the Lab: Monitor, Burst Simulator, and Comparison](#inside-the-lab-monitor-burst-simulator-and-comparison) — live pipeline observability, DLQ forensics, wave simulation, and real-vs-model validation.
+4. [Effect 4 showcase: 8 real patterns](#effect-4-showcase-8-real-patterns) — annotated excerpts straight from the codebase.
+5. [Architecture at a glance](#architecture-at-a-glance) — hexagons, enforced boundaries, packages, and the two web apps.
+6. [15-minute guided code tour](#15-minute-guided-code-tour) — the exact files to read in order if you are new here.
+7. [Four-level test pyramid](#four-level-test-pyramid) — from pure fake-port unit tests to full-stack E2E with fault injection.
+8. [Deployments, AWS setup, and reference](#deployments-aws-setup-and-reference) — deploying to real AWS and deep operational specs.
 
 ---
 
@@ -130,6 +131,72 @@ The codebase, tests, and docs share a strict ubiquitous language defined in [`CO
 | **Handler** | One Lambda invocation of a stage (1 email, 1 source, or 1 batch of up to 10 leads). |
 | **Stage cap** | Maximum concurrent handlers for a stage (50 inbox, 50 sources, 200 leads). |
 | **Deployment** | One complete, isolated copy of the pipeline made by one IaC tool (`local-alchemy`, `production-cdk`, etc.). |
+
+---
+
+## Inside the Lab: Monitor, Burst Simulator, and Comparison
+
+The **Lab** ([`apps/lab`](apps/lab), `http://localhost:4780`) is a full TanStack Start internal workbench that watches one deployment at a time (real AWS or local Floci). The screenshots below come from a real **`production-alchemy`** deployment on AWS (`eu-north-1`); the exact same Lab works identically against **`production-cdk`** (reading CloudFormation instead of Alchemy state) and local Floci deployments.
+
+It is built around two hexagons — **Observation** and **Simulation** — exposed as two pages that reinforce each other: the **Monitor** (`/`) observes the real pipeline, the **Burst Simulator** (`/simulator`) models it mathematically, and **Comparison** overlays real CloudWatch runs directly on top of the model.
+
+### The Monitor (`/`) — Live pipeline observability & DLQ forensics
+
+The Monitor separates cheap live state from on-demand CloudWatch reads: the **Request ledger** streams continuously, while CloudWatch snapshots load on page open, window change (`1 h`, `3 h`, `6 h`, `12 h`, `24 h`), or explicit Refresh — and warns you when recent activity is still inside CloudWatch's ~5-minute metric publishing delay.
+
+![Monitor overview on production-alchemy: live pipeline topology with CloudWatch metrics, Lambda billing formulas, critical leads-dlq alert, and the live Request ledger](docs/images/lab-monitor-overview.png)
+
+*Live Monitor on `production-alchemy`: real CloudWatch invocation counts, sparklines, and per-handler Lambda cost formulas alongside the red `1 critical` alert on `leads-dlq` (`2 messages`) and the live Request ledger below (complete with metered DynamoDB scan RCUs for the Lab's own polling).*
+
+- **Pipeline flow & automated health assessment ([`health.ts`](apps/lab/src/Core/Observation/Domain/health.ts)):** Draws the live topology (buckets, queues, handlers, DLQs, Orders table) with a single unified severity verdict (`ok` / `info` / `warning` / `critical`). Flags failed or in-progress deployments (reading either CloudFormation for CDK or Alchemy's DynamoDB state), disabled queue triggers, throttled invocations, Lambda runs exceeding 80% of their timeout, S3 objects stuck longer than 15 minutes, queue backlogs older than 5 minutes, and any message waiting in a DLQ.
+- **Live Request ledger over SSE ([`/api/requests`](apps/lab/src/routes/api/requests.ts)):** Polls DynamoDB every 2 seconds via `WatchRequests` and streams changes to the browser over Server-Sent Events with pause/resume controls. Even instruments the DynamoDB client with scan-metering middleware ([`services.server.ts`](apps/lab/src/Entrypoints/Lab/services.server.ts)) so the UI reports the exact Read Capacity Units consumed by the Lab's own polling.
+- **Per-request execution sheet ([`RequestSheet.tsx`](apps/lab/src/UI/RequestSheet.tsx)):** Click any request to open a slide-over sheet showing a cross-stage timeline of its real Lambda invocations (including cold-start `INIT` markers), every stage's CloudWatch log lines, observed file sizes, and an exact per-request AWS cost breakdown computed from the shared [`billing.ts`](packages/shared/src/Core/Shared/Domain/billing.ts) rules.
+- **DLQ inspector, automated cause detective & one-click redrive ([`DlqSheet.tsx`](apps/lab/src/UI/DlqSheet.tsx), [`ReadDeadLetterCause`](apps/lab/src/Core/Observation/Application/UseCases/ReadDeadLetterCause/handler.ts)):** Click any stage DLQ to inspect dead-lettered messages as JSON and send individual messages back to their main queue (automatically watching queue/bucket counts until the redriven work settles). Opening a DLQ row searches CloudWatch Logs in three escalating steps to pinpoint the failed run:
+  1. **Certain match:** a run whose logs name the exact `messageId`,
+  2. **Request match:** a failed run for a `requestID` carried by the message, nearest the receive time,
+  3. **Time-window match:** any failed or timed-out run (`ERROR`, `Task timed out`, `Status: error/timeout`) near the receive window.
+- **Window costs & tabbed resource inspector:** Summarizes observed AWS spend across the selected window alongside tabbed detail views for **Handlers**, **Queues**, **Buckets**, **Logs**, **Runtime settings** (the active AppConfig document), and **Stack** status.
+
+| Per-request run timeline, cold starts & AWS cost | DLQ inspector, 3-step Cause Detective & one-click redrive |
+| --- | --- |
+| ![Request details sheet showing 10 Lambda runs across three stages, cold-start INIT duration, memory usage, and per-stage AWS cost breakdown](docs/images/lab-monitor-request-sheet.png) | ![DLQ inspector sheet showing an exact CloudWatch Logs cause match with Effect LeadNotHandled SchemaError and Redrive button](docs/images/lab-monitor-dlq-sheet.png) |
+| One completed 3-workbook email (`60 / 60` leads): 10 Lambda runs on a `14.2 s` end-to-end timeline, exact per-stage AWS cost split (`$0.000385` total), and cold-start `INIT 527 ms` / memory breakdown per invocation. | Clicking `leads-dlq` inspects dead-lettered messages without deleting them; expanding a row automatically finds the `exact` CloudWatch run — showing Effect's `LeadNotHandled` + `SchemaError` right next to the **Redrive** button. |
+
+### The Burst Simulator (`/simulator`) — Capacity, wave & cost modeling
+
+Before changing concurrency caps, memory, batching windows, or rate limits in production, you can stress-test the pipeline mathematically in the **Burst Simulator** ([`docs/simulator-layout.md`](docs/simulator-layout.md)) — initialized directly from the same `@leads/shared` settings that CDK and Alchemy deploy.
+
+| Monthly & per-burst AWS cost projections (50 emails · 5M leads) | Automated AWS & stack limit guardrails |
+| --- | --- |
+| ![Burst Simulator knobs, monthly and per-burst cost cards, and stacked service breakdown](docs/images/lab-simulator-costs.png) | ![Burst Simulator red guardrail panel flagging SES 40 MB bounce limit and 2000 writes/s stack ceiling](docs/images/lab-simulator-limits.png) |
+| Live knobs in the left rail drive instant end-to-end duration (`42 min 5.8 s`), burst & monthly AWS spend (`$6.68 / burst`, `$200.34 / month`), and per-service cost splits (`DynamoDB 60%`, `Lambda 17%`, `SES 11%`, `SQS 9.4%`). | Pushing `L = 200,000` and `L_q_c = 250` highlights the offending knobs in red and computes exact safe ceilings: SES's 40 MB bounce limit (`L ≤ 10,215`) and the stack's 2,000 writes/s limit (`L_q_c ≤ 200`). |
+
+- **Six synchronized lanes on one clock:** Models a burst of emails flowing through six stacked lanes — **Emails tank**, **Inbox handlers**, **Sources queue tank**, **Source handlers**, **Leads queue tank**, and **Lead handlers** — scrubbed by one shared timeline cursor with Play/Pause (8-second playback), Start/End, drag-to-pan, and up to `256×` Ctrl+wheel zoom.
+- **Waves, internal handler phases & queue tanks:** Groups concurrent Lambda invocations into **waves** bounded by stage caps (`E_q_c`, `S_q_c`, `L_q_c`) and SQS event source mapping ramp-up (`esm_start`, `esm_rate`). Each bar is painted down to its individual internal steps — cold-start `INIT`, ledger writes, S3 reads/puts, parsing, SQS batch sends, token-bucket waits, DynamoDB stores, and deletes — while hovering shows exact step durations and release counts, and the tanks show live queue depth at the cursor.
+- **Interactive knobs mapped to real config:** Tune burst shape (`N` bursts/day, `E` emails, `S` sources/email, `L` leads/source, row & lead byte sizes), stage caps, AppConfig internal concurrencies (`in_c`, `src_c`, `ld_c`), lead batch size/window, per-environment write limit (`ld_writes`), Lambda memory, and per-step timings.
+- **Automatic AWS & stack limit guardrails ([`limits.ts`](apps/lab/src/Core/Simulation/Domain/limits.ts)):** Continuously validates your knob combination against real deployment constraints and calculates the exact safe ceiling whenever a limit breaks:
+  - **SES 40 MB bounce limit** (reports maximum `L` rows or `S` workbooks per email),
+  - **Cold-start Lambda timeouts** for inbox (1 min), source (5 min), and lead (1 min) handlers,
+  - **Token-bucket starvation** when waiting for order-write tokens pushes a lead handler past its timeout,
+  - **Stack order-write ceiling** (`L_q_c × ld_writes > 2,000 writes/s`),
+  - **SQS 1 MiB batch payload ceiling** (`min(L, 10) × lead_b`).
+- **Warm, burst, monthly & idle cost projections ([`burstCharges.ts`](apps/lab/src/Core/Simulation/Domain/burstCharges.ts)):** Uses the exact same `@leads/shared` billing formulas and AWS prices as the Monitor to project per-email warm ("pure") cost, full-burst ("applied" with cold starts) cost, monthly spend at `N` bursts/day, and per-service cost splits across SES, S3, SQS, Lambda, DynamoDB, and CloudWatch.
+
+![Six synchronized lanes in the Burst Simulator on one shared clock showing queue depth tanks and handler swarm ramp-up curves](docs/images/lab-simulator-waves.png)
+
+*Shared-clock timeline scrubbed to `7.026 s` (`10` emails × `4` sources × `200` leads = `8,000` leads): each stage shows its SQS event-source-mapping ramp-up curve, peak concurrency against its stage cap, in-flight AWS call bursts, and live queue tanks (`7,680 of 8,000 leads waiting`).*
+
+### Comparison — Real CloudWatch runs vs. the model
+
+Paste one or up to 10 real `requestID`s from the Monitor into the Simulator (`CompareRequest` / `ReadComparisons`) to calibrate the model against production or Floci reality:
+
+- **Single-request overlay ([`comparison.ts`](apps/lab/src/Core/Observation/Domain/comparison.ts)):** Locks the workload shape knobs (`E = 1`, observed `S`, mean `L`, mean `row_b`) from the real request's logs while keeping your timing knobs, then draws a **real-run lane** directly beneath each **modeled lane** on the same clock (starting from S3 email arrival). Compares handler counts, cold starts, latencies, durations, and real vs. modeled AWS cost side by side.
+- **Multi-request summary ([`comparisonSummary.ts`](apps/lab/src/Core/Observation/Domain/comparisonSummary.ts)):** Compares each request against its *own* shape's model first, then aggregates median, mean, min, and max real-to-model ratios across stages and AWS services — automatically excluding still-active, incomplete, or truncated requests from the aggregate while still showing their individual numbers.
+
+| Real vs. Model stage & AWS cost comparison | Real CloudWatch runs overlaid beneath modeled waves |
+| --- | --- |
+| ![Comparison tables locking E=1, S=3, L=20, row_b=1613 B and comparing modeled vs real latencies and AWS service costs](docs/images/lab-simulator-comparison.png) | ![Six-lane shared clock overlaying REAL Lambda runs directly underneath MODEL wave braces](docs/images/lab-simulator-comparison-lanes.png) |
+| Pasting a real `production-alchemy` request ID auto-locks `E = 1`, `S = 3`, `L = 20`, `row_b = 1,613 B` and compares every stage and AWS service — modeled total cost `$0.000358` vs. real `$0.000385` (`×1.08`). | Real CloudWatch runs painted step-by-step directly beneath the modeled wave braces (`3 / 50`, `×5`) — visibly distinguishing `3` cold-start lead invocations (`~3.1 s`) from `3` warm container reuses (`~0.6 s`). |
 
 ---
 
@@ -464,7 +531,7 @@ If you just cloned the repo and want to absorb the core ideas quickly, open thes
 5. **Check the Composition Root & Entrypoint:** [`apps/lambda/src/Entrypoints/Lambda/services.ts`](apps/lambda/src/Entrypoints/Lambda/services.ts) + [`inbox.ts`](apps/lambda/src/Entrypoints/Lambda/inbox.ts) + [`shutdown.ts`](apps/lambda/src/Entrypoints/Lambda/shutdown.ts) — wiring layers and translating Lambda deadlines into fiber interruption.
 6. **Explore Deterministic Tests:** [`packages/shared/src/Core/Shared/Ports/testing/variants.ts`](packages/shared/src/Core/Shared/Ports/testing/variants.ts) + [`HandleInbox/handler.test.variants.md`](packages/pipeline/src/Core/Pipeline/Application/UseCases/HandleInbox/handler.test.variants.md) — `Layer.mock` variant builders and `TestClock`.
 7. **Compare IaC in Effect vs. CDK:** [`iac/alchemy/alchemy.run.ts`](iac/alchemy/alchemy.run.ts) + [`iac/alchemy/src/stack.ts`](iac/alchemy/src/stack.ts) alongside [`iac/cdk`](iac/cdk) — both reading [`packages/shared/src/Infrastructure/Shared/names.ts`](packages/shared/src/Infrastructure/Shared/names.ts).
-8. **See Effect in a Full-Stack Web App:** [`apps/dashboard/src/Entrypoints/Dashboard/services.server.ts`](apps/dashboard/src/Entrypoints/Dashboard/services.server.ts) + [`OrderReader/cache.ts`](apps/dashboard/src/Infrastructure/Orders/OrderReader/cache.ts).
+8. **See Effect in the Web Apps (Dashboard & Lab):** [`apps/dashboard/src/Entrypoints/Dashboard/services.server.ts`](apps/dashboard/src/Entrypoints/Dashboard/services.server.ts) + [`OrderReader/cache.ts`](apps/dashboard/src/Infrastructure/Orders/OrderReader/cache.ts) for cached Effect `ManagedRuntime` wiring, and [`apps/lab/src/Core/Observation/Domain/health.ts`](apps/lab/src/Core/Observation/Domain/health.ts) + [`apps/lab/src/Core/Simulation/Domain/limits.ts`](apps/lab/src/Core/Simulation/Domain/limits.ts) for pure domain modeling in the Monitor and Burst Simulator.
 
 ---
 

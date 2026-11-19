@@ -1,6 +1,6 @@
 # Leads
 
-The leads pipeline: an inbound email with workbooks becomes stored orders, through three AWS Lambda handlers, S3, and SQS. Two web apps watch it: the [lab](apps/lab) and the [dashboard](apps/dashboard). The repo is a pnpm + Turborepo workspace (see [One hexagon per app](#one-hexagon-per-app-one-shared-kernel)). The domain language is in [CONTEXT.md](CONTEXT.md).
+The leads pipeline: an inbound email with workbooks becomes stored orders, through three AWS Lambda handlers, S3, and SQS. Two web apps watch it: the [lab](apps/lab) and the [dashboard](apps/dashboard). The repo is a pnpm + Turborepo workspace (see [One hexagon per app](#one-hexagon-per-app-one-shared-kernel)). The domain language is in [CONTEXT.md](CONTEXT.md), and the navigation handbook for driving the Lab (Monitor, Burst Simulator, Comparison) and the Orders dashboard is in [docs/lab-handbook.md](docs/lab-handbook.md).
 
 The project started as the folder `apps/leads` of a larger monorepo. A link or a ticket that names `apps/leads/…` or `pnx chubby leads …` means the root of this repo and `pnpm …`.
 
