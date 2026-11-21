@@ -1,6 +1,6 @@
 # @leads/alchemy
 
-The Alchemy stack of the pipeline: the resources of `LeadsStack` (iac/cdk), made by [Alchemy](https://alchemy.run/) v2 from the same contract (`@leads/shared/deployments`, `@leads/shared/names`, the shared settings) and the same Lambda bundle of `@leads/lambda`. See plan [0006](../../.agents/plans/0006-alchemy-iac.md) and spec [0005](../../.agents/specs/0005-alchemy-spike.md). A deployment with an `inboxAddress` receives email through its own rule in the shared rule set `leads-mail` of the mail stack, and `alchemy deploy` prints the DKIM and MX records of its domain ([ADR 0003](../../docs/adr/0003-one-shared-ses-rule-set.md)).
+The Alchemy stack of the pipeline: the resources of `LeadsStack` (iac/cdk), made by [Alchemy](https://alchemy.run/) v2 from the same contract (`@leads/shared/deployments`, `@leads/shared/names`, the shared settings) and the same Lambda bundle of `@leads/lambda`. The [spike report](../../docs/design/alchemy-spike.md) has what Alchemy could and could not do before this package existed. A deployment with an `inboxAddress` receives email through its own rule in the shared rule set `leads-mail` of the mail stack, and `alchemy deploy` prints the DKIM and MX records of its domain ([ADR 0003](../../docs/adr/0003-one-shared-ses-rule-set.md)).
 
 Each Alchemy deployment of [deployments.ts](../../packages/shared/src/Infrastructure/Shared/deployments.ts) is one stage of the Alchemy stack `LeadsStack`, with the deployment name as the stage: `production-alchemy`, `local-alchemy`, and `e2e-alchemy`.
 
@@ -80,9 +80,24 @@ pnpm exec alchemy destroy --stage production-alchemy --profile "$AWS_PROFILE"
 
 `test:integration` ([test-integration.sh](test-integration.sh)) starts the Floci image of Alchemy on port 4570, in the Compose project `leads-alchemy-integration` ([compose.integration.yaml](compose.integration.yaml)), and stops it at the end. [mail/stack.integration.test.ts](src/mail/stack.integration.test.ts) plans the mail stack in the same way. [stack.integration.test.ts](src/stack.integration.test.ts) runs `Alchemist.plan` for `e2e-alchemy` with in-memory state, and checks the props and the bindings of each planned resource against the shared settings and `resourceNames`. The plan reads the cloud, so the test needs a Floci. It applies nothing.
 
+## What each stack owns
+
+The CDK stack and the Alchemy stack run at the same time and share no data ([ADR 0002](../../docs/adr/0002-iac-tools-side-by-side.md)). The table shows `production-cdk` and `production-alchemy` with the example values of `deployments.ts`.
+
+| Resource | CDK (`production-cdk`) | Alchemy (`production-alchemy`) | Shared? |
+| --- | --- | --- | --- |
+| Buckets, queues, DLQs, tables, AppConfig application and strategy | prefix `example-leads` | prefix `example-leads-alchemy` | no: `resourceNames(prefix)` |
+| Lambda functions, roles, log groups, mappings | in the CloudFormation stack | in the Alchemy state | no |
+| Deploy state | stack `LeadsStack-example-leads` | table `alchemy-state`, stage `production-alchemy` | no |
+| Bootstrap | stack `CDKToolkit` and its asset bucket | `alchemy-state` and `alchemy-assets-<account>-<region>-an` | no |
+| SES identity, DKIM, and MX | `cdk.ses.example.com` | `alchemy.ses.example.com` | no |
+| SES receipt rule | its own rule | its own rule | no |
+| SES active rule set | — | — | **yes, by AWS design.** The mail stack owns `leads-mail` ([ADR 0003](../../docs/adr/0003-one-shared-ses-rule-set.md)). |
+| Lambda concurrency of the account | 300 reserved | 300 reserved | one pool for the account |
+
 ## What Alchemy adds
 
-Alchemy adds parts that the CDK stack does not have (spec 0005):
+Alchemy adds parts that the CDK stack does not have ([spike report](../../docs/design/alchemy-spike.md)):
 
 - each function: the variables `ALCHEMY_STACK_NAME`, `ALCHEMY_STAGE`, `ALCHEMY_PHASE`, and `NODE_OPTIONS=--enable-source-maps`, the managed policy `AWSLambdaBasicExecutionRole`, and an inline policy that denies `logs:CreateLogGroup`;
 - the log group of each function, which Alchemy makes before the first invocation, with the retention of `handlerSettings.logRetentionDays` (CDK makes a log group of the stack for each function);
