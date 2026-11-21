@@ -45,13 +45,13 @@
     "format:changed": "node scripts/format-changed.mjs"
   },
   "devDependencies": {
-    "@effect/tsgo": "0.37.0",
-    "@shadcn/lint": "^0.2.0",
+    "@effect/tsgo": "0.70.0",
+    "@shadcn/lint": "^0.2.5",
     "oxfmt": "^0.79.0",
-    "oxlint": "1.80.0",
-    "oxlint-tsgolint": "7.0.2001",
+    "oxlint": "1.94.0",
+    "oxlint-tsgolint": "7.0.2007",
     "sherif": "^1.13.0",
-    "turbo": "^2.10.4",
+    "turbo": "^2.11.13",
     "typescript": "catalog:"
   },
   "engines": {
