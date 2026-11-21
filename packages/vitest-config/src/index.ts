@@ -2,6 +2,9 @@ import { configDefaults, defineConfig, type ViteUserConfig } from 'vitest/config
 
 const integration = process.env.VITEST_INTEGRATION === '1';
 const e2e = process.env.VITEST_E2E === '1';
+// On CI, turbo runs the suite of every package at once on a runner of two cores, so a heavy test that takes under a
+// second alone can pass the default timeout of 5s.
+const ci = Boolean(process.env.CI);
 
 /**
  * The common Vitest settings of a package. A plain run takes the unit tests. `VITEST_INTEGRATION=1` takes only the
@@ -20,6 +23,7 @@ export function leadsTestConfig(test: NonNullable<ViteUserConfig['test']> = {}) 
         ...configDefaults.exclude,
         ...(integration || e2e ? [] : ['**/*.integration.test.ts', '**/*.e2e.test.ts']),
       ],
+      ...(ci && { testTimeout: 30_000 }),
       ...(e2e && { testTimeout: 90_000, hookTimeout: 90_000, fileParallelism: false }),
       passWithNoTests: !e2e,
       ...test,
