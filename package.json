@@ -4,7 +4,7 @@
   "private": true,
   "description": "An email-to-orders pipeline on AWS Lambda, S3, and SQS, built with Effect in a hexagonal architecture.",
   "license": "MIT",
-  "author": "Konstantin Sokolovskyi",
+  "author": "Kostiantyn Sokolovskyi",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ChubbyDuck/effect-email-lead-pipeline.git"
