@@ -22,6 +22,9 @@ import { normalizeSliceInputs, sourceDuration, sourceTimeline, type SliceInputs 
 import { sliceDefaults } from './testing/roundDefaults';
 import { releasesOf, type Timeline } from './timeline';
 
+// A heavy simulation runs in under a second alone, but CI runs every package at once on two cores.
+const heavyTimeout = 30_000;
+
 /** Every slot open at once and no INIT: the schedule of a mapping that is already scaled and warm. */
 const flat = { esm_start: 1000, in_init_t: 0, src_init_t: 0, ld_init_t: 0 };
 
@@ -336,11 +339,15 @@ describe('Order write limit', () => {
     expect(leadsTime(sliceDefaults)).toBeLessThan(2_530_000);
   });
 
-  it('makes a burst of 10x more emails take 10x longer', () => {
-    const time = leadsTime(slice({ E: 500 }));
-    expect(time).toBeGreaterThan(25_000_000);
-    expect(time).toBeLessThan(25_030_000);
-  });
+  it(
+    'makes a burst of 10x more emails take 10x longer',
+    () => {
+      const time = leadsTime(slice({ E: 500 }));
+      expect(time).toBeGreaterThan(25_000_000);
+      expect(time).toBeLessThan(25_030_000);
+    },
+    heavyTimeout
+  );
 
   it('keeps a slower handler below the limit, as it finds its tokens ready', () => {
     const slow = slice({ ld_order_repository_store_t: 1920 });
@@ -486,50 +493,54 @@ function batchedReference(input: SliceInputs, arrivals: number[]) {
 }
 
 describe('Slot schedule against a one-message-at-a-time reference', () => {
-  it('agrees on the end and the environment count of all three stages', () => {
-    let seed = 7;
-    const random = (n: number) => {
-      seed = (seed * 1_103_515_245 + 12_345) % 2_147_483_648;
-      return seed % n;
-    };
-    for (let index = 0; index < 300; index++) {
-      const input = slice({
-        E: 1 + random(30),
-        S: random(6),
-        E_q_c: 1 + random(20),
-        in_c: 1 + random(4),
-        S_q_c: 1 + random(30),
-        L: random(3) === 0 ? 0 : random(500),
-        src_c: 1 + random(10),
-        in_storage_store_t: random(300),
-        src_storage_read_t: random(2000),
-        row_b: random(3) === 0 ? 0 : random(5000),
-        in_storage_mb_t: random(3) === 0 ? 0 : random(40),
-        src_storage_mb_t: random(3) === 0 ? 0 : random(40),
-        in_init_t: random(3) === 0 ? 0 : random(800),
-        src_init_t: random(3) === 0 ? 0 : random(800),
-        esm_start: 1 + random(6),
-        esm_rate: random(4) === 0 ? 0 : random(2000),
-        delay_in: random(100),
-        delay_src: random(100),
-        L_q_c: 1 + random(30),
-        ld_batch: 1 + random(25),
-        ld_window_t: random(3) === 0 ? 0 : random(5000),
-        ld_c: 1 + random(10),
-        ld_order_repository_store_t: random(300),
-        ld_init_t: random(3) === 0 ? 0 : random(800),
-        delay_ld: random(100),
-        ld_writes: 1 + random(40),
-      });
-      const schedule = scheduleSlice(input);
-      const expected = reference(input);
-      // The inputs ride along so a failure names the case that broke.
-      expect({
-        input,
-        inbox: [schedule.inbox.end, schedule.inbox.environments],
-        sources: [schedule.sources.end, schedule.sources.environments],
-        leads: [schedule.leads.end, schedule.leads.environments],
-      }).toEqual({ input, ...expected });
-    }
-  });
+  it(
+    'agrees on the end and the environment count of all three stages',
+    () => {
+      let seed = 7;
+      const random = (n: number) => {
+        seed = (seed * 1_103_515_245 + 12_345) % 2_147_483_648;
+        return seed % n;
+      };
+      for (let index = 0; index < 300; index++) {
+        const input = slice({
+          E: 1 + random(30),
+          S: random(6),
+          E_q_c: 1 + random(20),
+          in_c: 1 + random(4),
+          S_q_c: 1 + random(30),
+          L: random(3) === 0 ? 0 : random(500),
+          src_c: 1 + random(10),
+          in_storage_store_t: random(300),
+          src_storage_read_t: random(2000),
+          row_b: random(3) === 0 ? 0 : random(5000),
+          in_storage_mb_t: random(3) === 0 ? 0 : random(40),
+          src_storage_mb_t: random(3) === 0 ? 0 : random(40),
+          in_init_t: random(3) === 0 ? 0 : random(800),
+          src_init_t: random(3) === 0 ? 0 : random(800),
+          esm_start: 1 + random(6),
+          esm_rate: random(4) === 0 ? 0 : random(2000),
+          delay_in: random(100),
+          delay_src: random(100),
+          L_q_c: 1 + random(30),
+          ld_batch: 1 + random(25),
+          ld_window_t: random(3) === 0 ? 0 : random(5000),
+          ld_c: 1 + random(10),
+          ld_order_repository_store_t: random(300),
+          ld_init_t: random(3) === 0 ? 0 : random(800),
+          delay_ld: random(100),
+          ld_writes: 1 + random(40),
+        });
+        const schedule = scheduleSlice(input);
+        const expected = reference(input);
+        // The inputs ride along so a failure names the case that broke.
+        expect({
+          input,
+          inbox: [schedule.inbox.end, schedule.inbox.environments],
+          sources: [schedule.sources.end, schedule.sources.environments],
+          leads: [schedule.leads.end, schedule.leads.environments],
+        }).toEqual({ input, ...expected });
+      }
+    },
+    heavyTimeout
+  );
 });
