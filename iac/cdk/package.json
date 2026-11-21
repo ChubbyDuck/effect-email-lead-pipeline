@@ -27,7 +27,7 @@
     "@leads/typescript-config": "workspace:*",
     "@leads/vitest-config": "workspace:*",
     "@types/node": "catalog:",
-    "aws-cdk": "^2.1143.0",
+    "aws-cdk": "^2.1148.1",
     "tsx": "4.23.15",
     "typescript": "catalog:",
     "vitest": "catalog:"
