@@ -1,6 +1,6 @@
 # The Floci of `local-alchemy` (`pnpm floci:alchemy:up`), in a Compose project of its own, so that it runs next to the
 # Floci of `local-cdk` (compose.integration.yaml). It runs the Floci image of Alchemy: the image of the repo lacks
-# `DescribeContributorInsights`, which `DynamoDB.Table` calls (spec 0005).
+# `DescribeContributorInsights`, which `DynamoDB.Table` calls (docs/design/alchemy-spike.md).
 # The port is the `flociPort` of `local-alchemy` in packages/shared/src/Infrastructure/Shared/deployments.ts.
 # The handlers reach this Floci as `http://floci:4566`, in the Docker network of the project (iac/alchemy/alchemy.run.ts).
 name: leads-local-alchemy
