@@ -2,8 +2,6 @@
 
 The leads pipeline: an inbound email with workbooks becomes stored orders, through three AWS Lambda handlers, S3, and SQS. Two web apps watch it: the [lab](apps/lab) and the [dashboard](apps/dashboard). The repo is a pnpm + Turborepo workspace (see [One hexagon per app](#one-hexagon-per-app-one-shared-kernel)). The domain language is in [CONTEXT.md](CONTEXT.md), and the navigation handbook for driving the Lab (Monitor, Burst Simulator, Comparison) and the Orders dashboard is in [docs/lab-handbook.md](docs/lab-handbook.md).
 
-The project started as the folder `apps/leads` of a larger monorepo. A link or a ticket that names `apps/leads/…` or `pnx chubby leads …` means the root of this repo and `pnpm …`.
-
 A file that git ignores, `AGENTS.local.md`, can hold the instructions of one machine, such as the AWS profile and the sign-in of the owner. Read it when it exists.
 
 ## What are my engineering values and principles?
@@ -23,33 +21,18 @@ A frontend is usually just connected to the backend using an HTTP API (REST / tR
 
 ## Testing
 
-Testing in these architecture is trivial. Domain entities can be trivially checked using unit tests. Services can have their mock implementations. Use cases can be tested fully mocked (as they depend only on interfaces). For the shape of a use case suite, load the `effect-use-case-tests` skill.
+Testing in these architecture is trivial. Domain entities can be trivially checked using unit tests. Services can have their mock implementations. Use cases can be tested fully mocked (as they depend only on interfaces). For the shape of a use case suite, read the suite of HandleInbox: its [variant tree](packages/pipeline/src/Core/Pipeline/Application/UseCases/HandleInbox/handler.test.variants.md), its [tests](packages/pipeline/src/Core/Pipeline/Application/UseCases/HandleInbox/handler.test.ts), and its [harness](packages/pipeline/src/Core/Pipeline/Application/UseCases/HandleInbox/handler.test.helpers.ts).
 
 ## Effect source
 
 When working with Effect (`effect`, `@effect/*`), read the source of the installed version: `node_modules/effect/src` of the package that uses it, or the [Effect repo](https://github.com/Effect-TS/effect) on GitHub. Do not guess APIs from types or docs when the source is available.
 
-## Tickets, Plans & Specs
+## Decisions and design records
 
-**This repo has no external issue tracker.** Whenever a skill or workflow says to "publish to the project issue tracker", "create a GitHub issue", or "apply a triage label", write a file instead. Never run `gh issue create`.
-
-| Artifact | Location | Naming |
+| Document | Location | Naming |
 | --- | --- | --- |
-| **Ticket** — one unit of agent work | `.agents/tickets/` | `NN-slug.md`, continuing that folder's sequence |
-| **Plan / PRD** | `.agents/plans/` | `NNNN-slug.md`, continuing that folder's sequence |
-| **Tech spec** | `.agents/specs/` | `NNNN-slug.md` |
-| **Handoff** — next-session brief | `.agents/handoffs/` | `slug.md` |
 | **ADR** — a decision that is hard to reverse, surprising without context, and the result of a real trade-off | `docs/adr/` | `NNNN-slug.md`, continuing that folder's sequence |
-| **Loop log** — what a `loop` run (the ticket loop, see the `ticket-loop` skill) leaves for the owner: deviations, deferred work, unfixed findings | `.agents/loop-logs/` | `<run start, UTC>.md`, one per run; holds the follow-up work, in place of new tickets |
-
-Store `/handoff` documents in `.agents/handoffs/`, not in the OS temp directory.
-
-Ticket rules:
-
-- One file per ticket, declaring its blocking edges. Do not create or update a `README.md`, index, dependency table, or other aggregate ticket file.
-- Triage labels become body fields: write `**Status:** ready-for-agent` in the ticket rather than applying a label.
-- Reference the plan or spec the ticket was generated from.
-- When an agent completes a ticket, move the file into `.agents/tickets/done/`.
+| **Design record** — the design of a feature as it was decided, or the report of a spike. The code is the source of truth after it. | `docs/design/` | `slug.md` |
 
 ## Commands
 

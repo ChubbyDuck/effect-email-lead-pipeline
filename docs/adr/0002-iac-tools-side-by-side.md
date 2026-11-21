@@ -1,6 +1,6 @@
 # IaC tools side by side, as separate deployments
 
-**Status:** accepted (17 Nov 2026). Plan: [0005-monorepo](../../.agents/plans/0005-monorepo.md).
+**Status:** accepted (17 Nov 2026).
 
 The stack is in CDK, and we want to try a second IaC tool (Alchemy or Pulumi). For a transition period, both stacks must work at the same time and share no data, so that we can deploy the app with each tool and compare the results. Thus `iac/` is a namespace with one package for each tool (`iac/cdk` first), and the target of a deploy, of the lab, and of the dashboard is a **deployment**: one complete copy of the pipeline, made by one tool in one place.
 

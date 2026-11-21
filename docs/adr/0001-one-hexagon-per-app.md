@@ -1,6 +1,6 @@
 # One hexagon per app, in a Turborepo workspace
 
-**Status:** accepted (17 Nov 2026). Plan: [0005-monorepo](../../.agents/plans/0005-monorepo.md).
+**Status:** accepted (17 Nov 2026).
 
 The repo was one package with "one core" (`src`) for three runtimes. In that core, each subdomain except the shared kernel had exactly one runtime that used it in production: Pipeline for the Lambda handlers, Orders for the dashboard, and Observation and Simulation for the lab. We made the repo a pnpm + Turborepo workspace in which each app owns its own hexagon (Core, Infrastructure, Entrypoints), and the shared kernel is the library `@leads/shared`. The goals are dependency isolation (the Lambda bundle cannot pull React, and a web app cannot pull `aws-cdk-lib`) and independent, cached checks for each package.
 

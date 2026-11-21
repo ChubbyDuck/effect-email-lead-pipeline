@@ -1,6 +1,6 @@
 # One shared SES rule set, one subdomain for each deployment
 
-**Status:** accepted (18 Nov 2026). Plan: [0006-alchemy-iac](../../.agents/plans/0006-alchemy-iac.md), phase 4. It does the split that the "Consequences" of [ADR 0002](0002-iac-tools-side-by-side.md) delayed.
+**Status:** accepted (18 Nov 2026). It does the split that the "Consequences" of [ADR 0002](0002-iac-tools-side-by-side.md) delayed.
 
 SES has one active receipt rule set for each Region, and a domain has one identity. Two deployments in the same AWS project, `production-cdk` and `production-alchemy`, must each receive real email. Thus the account has one rule set, and each deployment adds its own rule to it.
 
@@ -13,7 +13,7 @@ SES has one active receipt rule set for each Region, and a domain has one identi
   | `production-cdk` | `noreply@cdk.ses.example.com` | `example-leads-inbox` |
   | `production-alchemy` | `noreply@alchemy.ses.example.com` | `example-leads-alchemy-inbox` |
 
-- **The CDK address changed.** `production-cdk` received on `noreply@ses.example.com`. It now receives on `noreply@cdk.ses.example.com` only. The old rule set `example-leads-inbox`, its activation, and the identity `ses.example.com` are gone. The move kept email open at all times: the CDK rule received on both addresses until `leads-mail` was active (tickets [57](../../.agents/tickets/done/57-receive-cdk-email-through-the-shared-rule-set.md) and [58](../../.agents/tickets/done/58-move-the-cdk-stack-to-cdk-ses.md)).
+- **The CDK address changed.** `production-cdk` received on `noreply@ses.example.com`. It now receives on `noreply@cdk.ses.example.com` only. The old rule set `example-leads-inbox`, its activation, and the identity `ses.example.com` are gone. The move kept email open at all times: the CDK rule received on both addresses until `leads-mail` was active.
 
 ## Consequences
 

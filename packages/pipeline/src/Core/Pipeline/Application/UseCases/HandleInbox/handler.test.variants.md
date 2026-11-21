@@ -1,6 +1,6 @@
 # HandleInbox variant tree
 
-Source: [`handler.ts`](./handler.ts) · Tests: [`handler.test.ts`](./handler.test.ts) · Harness: [`handler.test.helpers.ts`](./handler.test.helpers.ts) · Previous review: [`0001-handle-inbox-use-case-tests.md`](../../../../../../.agents/plans/0001-handle-inbox-use-case-tests.md)
+Source: [`handler.ts`](./handler.ts) · Tests: [`handler.test.ts`](./handler.test.ts) · Harness: [`handler.test.helpers.ts`](./handler.test.helpers.ts)
 
 `[Tn]` is the first testing stage for that context, not execution order. Arrows are continuations in the handler.
 

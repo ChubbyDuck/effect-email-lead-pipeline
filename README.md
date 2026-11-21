@@ -671,6 +671,10 @@ Run a second Lab instance simultaneously by setting `PORT`. Generator outputs go
   - [0002 — IaC tools side by side](docs/adr/0002-iac-tools-side-by-side.md)
   - [0003 — One shared SES rule set](docs/adr/0003-one-shared-ses-rule-set.md)
   - [0004 — Real deployment values in a local file](docs/adr/0004-real-deployment-values-in-a-local-file.md)
+- **Design records ([`docs/design`](docs/design)):** each one is the design as it was decided; the code is the source of truth after it.
+  - [Request progress](docs/design/request-progress.md) — the attributes of a request ledger entry, when each handler writes them, and what happens when a write fails.
+  - [Orders dashboard](docs/design/orders-dashboard.md) — the search, sort, and paging rules, the URL state, and the read cache.
+  - [The Alchemy spike](docs/design/alchemy-spike.md) — what Alchemy could and could not do, the Floci endpoint, and one email through both production deployments.
 - [`docs/simulator-layout.md`](docs/simulator-layout.md) — design of the Burst Simulator.
 - [`e2e/src/pipeline.e2e.cases.md`](e2e/src/pipeline.e2e.cases.md) — complete E2E fault-injection test matrix.
 - [`iac/alchemy/README.md`](iac/alchemy/README.md) — one-time setup for `production-alchemy` and the shared SES mail stack.
