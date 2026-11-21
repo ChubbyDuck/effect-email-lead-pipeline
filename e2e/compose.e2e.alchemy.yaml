@@ -1,5 +1,5 @@
 # The Floci of the e2e suite on Alchemy (`test-e2e-floci.sh alchemy`). It runs the Floci image of Alchemy: the image of
-# the repo (compose.e2e.yaml) lacks `DescribeContributorInsights`, which `DynamoDB.Table` calls (spec 0005).
+# the repo (compose.e2e.yaml) lacks `DescribeContributorInsights`, which `DynamoDB.Table` calls (docs/design/alchemy-spike.md).
 services:
   floci:
     image: ghcr.io/alchemy-run/floci:2.4.0-alchemy.3@sha256:c9e87d338c8a7be6fa131451961a8baa1e0f9f6312b5aea44a00f12472d5bd85

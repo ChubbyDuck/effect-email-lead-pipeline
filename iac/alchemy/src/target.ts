@@ -8,7 +8,7 @@ import * as Redacted from 'effect/Redacted';
 /**
  * The AWS environment of a Floci deployment, pinned to the Floci at `endpoint`: the account and the Region of the
  * deployment, and the `test` credentials. `alchemy deploy` ignores `AWS_ENDPOINT_URL`, so the stack gives the providers
- * and the state store this environment (spec 0005, step 9).
+ * and the state store this environment (docs/design/alchemy-spike.md, step 9).
  */
 export const flociEnvironment = (deployment: Deployment, endpoint: string) =>
   Layer.succeed(

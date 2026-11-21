@@ -11,7 +11,7 @@ cd "$(dirname "$0")"
 
 case "$iac" in
   cdk) compose_file=compose.e2e.yaml port=4567 ;;
-  # The Floci image of Alchemy: the image of the repo lacks an API that Alchemy calls (spec 0005).
+  # The Floci image of Alchemy: the image of the repo lacks an API that Alchemy calls (docs/design/alchemy-spike.md).
   alchemy) compose_file=compose.e2e.alchemy.yaml port=4569 ;;
   *) echo "Unknown IaC tool: $iac" >&2; exit 1 ;;
 esac
